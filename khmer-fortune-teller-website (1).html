@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Khmer Fortune Teller – BaZi and Feng Shui Calculators</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+<style>
+:root{--bg:#FFDCE8;--card:#FFFFFF;--ink:#3B1220;--muted:#7A5560;--line:#FBCFE8;--soft:#FFF7F8;--primary:#E11D48;--primary-d:#BE123C;--good:#15803D;--bad:#DC2626;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh}
+.cn{font-family:"Noto Serif CJK SC","Songti SC","SimSun",serif}
+.card{background:var(--card);border:1px solid var(--line);border-radius:1.25rem;box-shadow:0 2px 6px rgba(190,18,60,.06),0 12px 32px rgba(190,18,60,.08)}
+.soft{background:var(--soft);border:1px solid var(--line);border-radius:1rem}
+.muted{color:var(--muted)}
+.field{width:100%;height:3rem;padding:0 .9rem;font-size:16px;border-radius:.75rem;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.field:focus{outline:2px solid var(--primary);border-color:var(--primary)}
+.btn{height:3rem;border-radius:.75rem;font-weight:600;padding:0 1.25rem;transition:background-color .2s,transform .1s}
+.btn:active{transform:scale(.98)}
+.btn-p{background:var(--primary);color:#fff}.btn-p:hover{background:var(--primary-d)}
+.btn-g{border:1px solid var(--line);color:var(--ink);background:var(--card)}.btn-g:hover{background:var(--soft)}
+.seg{flex:1;padding:.6rem .5rem;font-size:.92rem;border-radius:.65rem;transition:background-color .25s,color .25s;color:var(--muted)}
+.seg[aria-pressed="true"]{background:var(--primary);color:#fff}
+.cell{border:1px solid var(--line);border-radius:.8rem;padding:.4rem;min-height:6.2rem;display:flex;flex-direction:column;gap:.25rem;transition:background-color .5s,border-color .5s}
+.chip-sy{font-size:.66rem;line-height:1.25;border-radius:.4rem;padding:.12rem .35rem;color:#fff}
+th,td{padding:.6rem .75rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);font-size:.9rem}
+th{font-size:.78rem;color:var(--muted);font-weight:600;background:var(--soft);position:sticky;top:0}
+.fade{animation:fade .5s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.fade{animation:none}*{transition-duration:.01ms!important}}
+
+:root{--door:#E11D48;--mtn:#B45309;--water:#2563EB}
+.chip{display:inline-block;font-size:.78rem;border-radius:.5rem;padding:.1rem .5rem;margin:.1rem .2rem .1rem 0;color:#fff}
+.chip-tl{display:inline-block;font-size:.76rem;border-radius:.5rem;padding:.1rem .45rem;margin:.1rem .2rem .1rem 0;color:#fff}
+table{width:100%;border-collapse:separate;border-spacing:0}
+tr.hl td{background:#FFE9F0}
+
+
+:root{--bg:#FFDCE8;--card:#FFFFFF;--ink:#3B1220;--muted:#7A5560;--line:#FBCFE8;--soft:#FFF7F8;--primary:#E11D48;--primary-d:#BE123C;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Noto Sans Khmer","Khmer OS Battambang","Leelawadee UI",sans-serif;min-height:100vh}
+html[lang="km"] body{line-height:1.8}
+.cn{font-family:"Noto Serif CJK SC","Songti SC","SimSun",serif}
+.card{background:var(--card);border:1px solid var(--line);border-radius:1.25rem;box-shadow:0 2px 6px rgba(190,18,60,.06),0 12px 32px rgba(190,18,60,.08)}
+.soft{background:var(--soft);border:1px solid var(--line);border-radius:1rem}
+.muted{color:var(--muted)}
+.field{width:100%;height:3rem;padding:0 .9rem;font-size:16px;border-radius:.75rem;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.field:focus{outline:2px solid var(--primary);border-color:var(--primary)}
+.btn{height:3rem;border-radius:.75rem;font-weight:600;padding:0 1.25rem;transition:background-color .2s,transform .1s}
+.btn:active{transform:scale(.98)}
+.btn-p{background:var(--primary);color:#fff}.btn-p:hover{background:var(--primary-d)}
+.btn-g{border:1px solid var(--line);color:var(--ink);background:var(--card)}.btn-g:hover{background:var(--soft)}
+.tab{flex:1;padding:.6rem .5rem;font-size:.92rem;border-radius:.65rem;transition:background-color .25s,color .25s;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--primary);color:#fff}
+.cell-b{border:1px solid var(--line);border-radius:.8rem;padding:.4rem .25rem;text-align:center;min-height:5.4rem;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;transition:background-color .5s}
+.fade{animation:fade .5s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.fade{animation:none}*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const BaziKua=(()=>{
+
+const {useState,useEffect} = React;
+const html = htm.bind(React.createElement);
+
+/* ---------- translations ---------- */
+const D = {
+en:{
+ title:'BaZi and Feng Shui Calculator', sub:'Four Pillars, Day Master strength, Kua number, and flying stars.',
+ mBazi:'BaZi', mFs:'Feng Shui', date:'Birth date', time:'Birth time', opt:'(optional)', gender:'Gender', female:'Female', male:'Male',
+ calc:'Calculate', reset:'Reset', eDate:'Enter your birth date.', eYear:'Use a birth year between 1901 and 2100.',
+ eGender:'Choose female or male (needed for luck cycles and Kua).', cyear:'Chart year', eCy:'Enter a chart year between 1901 and 2100.',
+ strength:'Day Master strength', zones:['Very weak','Weak','Balanced','Strong','Very strong'],
+ tabs:['Four Pillars','Day Master','Luck Cycles'], pl:['Year','Month','Day','Hour'], dmTag:'Day Master',
+ needTime:'Add a birth time to see this pillar', rl:'Read right to left in tradition: Year, Month, Day, Hour. Shown here with the Hour on the left.',
+ dmText:(c,e,p,z)=>`Your Day Master is ${c} (${e}). About ${p}% of the energy in your chart supports it, so it reads as ${z.toLowerCase()}.`,
+ gods:'Useful gods', five:'Five elements in your chart',
+ roles:['Resource: nourishes and supports you','Companion: adds strength and allies','Output: releases excess energy through talent and work','Wealth: channels strength into results','Weakest element in your chart: adds balance'],
+ el:['Wood','Fire','Earth','Metal','Water'], an:['Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat','Monkey','Rooster','Dog','Pig'],
+ fwd:'forward', bwd:'backward', luckText:(d,a)=>`Luck cycles run ${d} and begin at about age ${a}. Each cycle lasts 10 years.`, age:'Age',
+ tip:'Tip: add your birth time to include the Hour pillar, which also improves the strength estimate.',
+ disc:'For learning and entertainment. Solar-term dates are calculated to the day, so births on a boundary day may differ by one pillar. Check with a Feng Shui master for a full reading.',
+ kua:'Kua number', grp:['East group','West group'], good:'4 good directions', bad:'4 bad directions', fsTabs:['Kua and directions','Annual chart'],
+ dirs:['North','Northeast','East','Southeast','South','Southwest','West','Northwest'],
+ dn:[{n:'Sheng Qi',m:'Success and wealth'},{n:'Tian Yi',m:'Health'},{n:'Yan Nian',m:'Relationships'},{n:'Fu Wei',m:'Stability'},{n:'Huo Hai',m:'Mishaps'},{n:'Wu Gui',m:'Five Ghosts'},{n:'Liu Sha',m:'Six Killings'},{n:'Jue Ming',m:'Total Loss'}],
+ stars:['Career, wealth','Illness','Quarrels','Romance, study','Misfortune','Authority, help','Theft, gossip','Wealth','Celebration'],
+ annTitle:'Annual flying star chart', yearInfo:'Year chart', taiSui:'Tai Sui', suiPo:'Sui Po', center:'Center star',
+ southTop:'South is at the top of each chart.', dots:'Dots show your personal directions: green is good, red is bad.',
+ fsDisc:'For learning and entertainment. The Feng Shui year starts at Lichun (about 4 February). Kua uses the Bazhai (Eight Mansions) formula.'},
+km:{
+ title:'ម៉ាស៊ីនគណនា បាជឺ និងហុងស៊ុយ', sub:'បួនសសរ កម្លាំងធាតុខ្លួន លេខគួរ និងផ្កាយហោះ',
+ mBazi:'បាជឺ', mFs:'ហុងស៊ុយ', date:'ថ្ងៃខែឆ្នាំកំណើត', time:'ម៉ោងកំណើត', opt:'(ស្រេចចិត្ត)', gender:'ភេទ', female:'ស្រី', male:'ប្រុស',
+ calc:'គណនា', reset:'សម្អាត', eDate:'សូមបញ្ចូលថ្ងៃកំណើត។', eYear:'សូមប្រើឆ្នាំកំណើតចន្លោះ ១៩០១ ដល់ ២១០០។',
+ eGender:'សូមជ្រើសរើសភេទ (ត្រូវការសម្រាប់វដ្តសំណាង និងលេខគួរ)។', cyear:'ឆ្នាំតារាង', eCy:'សូមបញ្ចូលឆ្នាំតារាងចន្លោះ ១៩០១ ដល់ ២១០០។',
+ strength:'កម្លាំងធាតុខ្លួន', zones:['ខ្សោយខ្លាំង','ខ្សោយ','មានតុល្យភាព','ខ្លាំង','ខ្លាំងខ្លាំង'],
+ tabs:['បួនសសរ','ធាតុខ្លួន','វដ្តសំណាង'], pl:['ឆ្នាំ','ខែ','ថ្ងៃ','ម៉ោង'], dmTag:'ធាតុខ្លួន',
+ needTime:'បញ្ចូលម៉ោងកំណើតដើម្បីមើលសសរនេះ', rl:'តាមប្រពៃណី អានពីស្តាំទៅឆ្វេង៖ ឆ្នាំ ខែ ថ្ងៃ ម៉ោង។ នៅទីនេះបង្ហាញម៉ោងនៅខាងឆ្វេង។',
+ dmText:(c,e,p,z)=>`ធាតុខ្លួនរបស់អ្នកគឺ ${c} (${e})។ ប្រហែល ${p}% នៃថាមពលក្នុងតារាងគាំទ្រវា ដូច្នេះវាស្ថិតក្នុងកម្រិត៖ ${z}។`,
+ gods:'ទេវតាមានប្រយោជន៍', five:'ធាតុទាំងប្រាំក្នុងតារាងរបស់អ្នក',
+ roles:['ធនធាន៖ ជួយចិញ្ចឹម និងគាំទ្រអ្នក','មិត្តរួម៖ បន្ថែមកម្លាំង និងអ្នកជួយ','ទិន្នផល៖ បញ្ចេញថាមពលលើសតាមទេពកោសល្យ និងការងារ','ទ្រព្យ៖ បំប្លែងកម្លាំងទៅជាលទ្ធផល','ធាតុខ្សោយបំផុតក្នុងតារាងអ្នក៖ បន្ថែមតុល្យភាព'],
+ el:['ឈើ','ភ្លើង','ដី','ដែក','ទឹក'], an:['ជូត','ឆ្លូវ','ខាល','ថោះ','រោង','ម្សាញ់','មមី','មមែ','វក','រកា','ច','កុរ'],
+ fwd:'ទៅមុខ', bwd:'ថយក្រោយ', luckText:(d,a)=>`វដ្តសំណាងដំណើរ${d} ហើយចាប់ផ្តើមនៅអាយុប្រហែល ${a}។ វដ្តនីមួយៗមានរយៈពេល ១០ ឆ្នាំ។`, age:'អាយុ',
+ tip:'គន្លឹះ៖ បញ្ចូលម៉ោងកំណើតដើម្បីបង្ហាញសសរម៉ោង និងធ្វើឱ្យការប៉ាន់ស្មានកម្លាំងកាន់តែត្រឹមត្រូវ។',
+ disc:'សម្រាប់ការសិក្សា និងកម្សាន្តប៉ុណ្ណោះ។ ថ្ងៃចូលរដូវកាលត្រូវបានគណនាតាមថ្ងៃ ដូច្នេះអ្នកដែលកើតនៅថ្ងៃព្រំដែនអាចខុសមួយសសរ។ សូមពិគ្រោះជាមួយគ្រូហុងស៊ុយសម្រាប់ការអានពេញលេញ។',
+ kua:'លេខគួរ (Kua)', grp:['ក្រុមខាងកើត','ក្រុមខាងលិច'], good:'ទិសល្អ ៤', bad:'ទិសអាក្រក់ ៤', fsTabs:['គួរ និងទិស','តារាងប្រចាំឆ្នាំ'],
+ dirs:['ជើង','ឦសាន','កើត','អាគ្នេយ៍','ត្បូង','និរតី','លិច','ពាយ័ព្យ'],
+ dn:[{n:'Sheng Qi',m:'ជោគជ័យ និងទ្រព្យ'},{n:'Tian Yi',m:'សុខភាព'},{n:'Yan Nian',m:'ទំនាក់ទំនង'},{n:'Fu Wei',m:'ស្ថិរភាព'},{n:'Huo Hai',m:'គ្រោះថ្នាក់'},{n:'Wu Gui',m:'ព្រលឹងអាក្រក់ទាំងប្រាំ'},{n:'Liu Sha',m:'ឧបទ្ទវហេតុទាំងប្រាំមួយ'},{n:'Jue Ming',m:'បាត់បង់ទាំងស្រុង'}],
+ stars:['ការងារ ទ្រព្យ','ជំងឺ','ជម្លោះ','ស្នេហា ការសិក្សា','គ្រោះអាក្រក់','អំណាច ជំនួយ','ចោរកម្ម ចចាម','ទ្រព្យសម្បត្តិ','ការអបអរសាទរ'],
+ annTitle:'តារាងផ្កាយហោះប្រចាំឆ្នាំ', yearInfo:'តារាងឆ្នាំ', taiSui:'ថៃស៊ូយ', suiPo:'ស៊ុយប៉ូ', center:'ផ្កាយកណ្តាល',
+ southTop:'ទិសត្បូងនៅខាងលើនៃតារាងនីមួយៗ។', dots:'ចំណុចបង្ហាញទិសផ្ទាល់ខ្លួនរបស់អ្នក៖ បៃតងល្អ ក្រហមអាក្រក់។',
+ fsDisc:'សម្រាប់ការសិក្សា និងកម្សាន្តប៉ុណ្ណោះ។ ឆ្នាំហុងស៊ុយចាប់ផ្តើមនៅលីឆុន (ប្រហែល ៤ កុម្ភៈ)។ លេខគួរប្រើរូបមន្តប៉ាជ័យ (Bazhai)។'}
+};
+let L='en';
+const t=k=>D[L][k]!==undefined?D[L][k]:D.en[k];
+
+/* ---------- data ---------- */
+const STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const STEM_PY=['Jiǎ','Yǐ','Bǐng','Dīng','Wù','Jǐ','Gēng','Xīn','Rén','Guǐ'];
+const BR=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const BR_PY=['Zǐ','Chǒu','Yín','Mǎo','Chén','Sì','Wǔ','Wèi','Shēn','Yǒu','Xū','Hài'];
+const ELC=[{c:'木',col:'#16a34a'},{c:'火',col:'#ea580c'},{c:'土',col:'#ca8a04'},{c:'金',col:'#64748b'},{c:'水',col:'#2563eb'}];
+const BR_EL=[4,2,0,0,2,1,1,2,3,3,2,4];
+const HIDDEN=[[9],[5,9,7],[0,2,4],[1],[4,1,9],[2,6,4],[3,5],[5,3,1],[6,8,4],[7],[4,7,3],[8,0]];
+const HW={1:[1],2:[.7,.3],3:[.6,.3,.1]};
+const C21=[5.4055,3.87,5.63,4.81,5.52,5.678,7.108,7.5,7.646,8.318,7.438,7.18];
+const C20=[6.11,4.6295,6.3826,5.59,6.318,6.5,7.928,8.35,8.44,9.098,8.218,7.9];
+const JIE_BR=[1,2,3,4,5,6,7,8,9,10,11,0];
+const ZCOL=['#fda4af','#fb7185','#f43f5e','#e11d48','#9f1239'], ZMAX=[30,45,55,70,101];
+
+/* ---------- BaZi calculation ---------- */
+function jieList(y){
+  const c=y>=2001?C21:C20, Y=y>=2001?y-2000:y-1900;
+  return c.map((k,i)=>({t:Date.UTC(y,i,Math.floor(Y*0.2422+k)-Math.floor((Y-1)/4)),b:JIE_BR[i]}));
+}
+const idx60=(s,b)=>{for(let k=0;k<60;k++) if(k%10===s&&k%12===b) return k;};
+function calc(dateStr,timeStr,gender){
+  const [Y,M,D0]=dateStr.split('-').map(Number), tt=Date.UTC(Y,M-1,D0);
+  const all=[...jieList(Y-1),...jieList(Y),...jieList(Y+1)];
+  let mi=0; all.forEach((j,i)=>{if(j.t<=tt) mi=i;});
+  const by=tt>=jieList(Y)[1].t?Y:Y-1, ys=((by-4)%10+10)%10, yb=((by-4)%12+12)%12;
+  const mb=all[mi].b, ms=((ys%5)*2+2+((mb-2+12)%12))%10;
+  const n=Math.round((tt-Date.UTC(2000,0,1))/864e5), di=(((54+n)%60)+60)%60, ds=di%10, db=di%12;
+  const pillars=[{s:ys,b:yb},{s:ms,b:mb},{s:ds,b:db}];
+  if(timeStr){const h=parseInt(timeStr,10), hb=Math.floor((h+1)/2)%12; pillars.push({s:((ds%5)*2+hb)%10,b:hb});}
+  else pillars.push({s:null,b:null});
+  const el=[0,0,0,0,0], dm=Math.floor(ds/2); let support=0,total=0;
+  const add=(e,w)=>{el[e]+=w;total+=w;if(e===dm||e===(dm+4)%5) support+=w;};
+  pillars.forEach((p,i)=>{
+    if(p.s===null) return;
+    if(i!==2) add(Math.floor(p.s/2),i===1?1.5:1);
+    const hs=HIDDEN[p.b], bw=[1,2.5,1.5,1][i];
+    hs.forEach((h,k)=>add(Math.floor(h/2),bw*HW[hs.length][k]));
+  });
+  const pct=Math.round(support/total*100), zi=ZMAX.findIndex(m=>pct<m);
+  let gods;
+  if(pct<=45) gods=[{e:(dm+4)%5,r:0},{e:dm,r:1}];
+  else if(pct>=55) gods=[{e:(dm+1)%5,r:2},{e:(dm+2)%5,r:3}];
+  else gods=[{e:el.indexOf(Math.min(...el)),r:4}];
+  const fwd=(ys%2===0)===(gender==='male');
+  const days=fwd?(all[mi+1].t-tt)/864e5:(tt-all[mi].t)/864e5, startAge=days/3, mIdx=idx60(ms,mb);
+  const cycles=Array.from({length:8},(_,i)=>{
+    const k=(((mIdx+(fwd?i+1:-(i+1)))%60)+60)%60, a=startAge+i*10;
+    return {s:k%10,b:k%12,age:a,year:Y+Math.floor(a)};
+  });
+  return {pillars,el,pct,zi,gods,dm,fwd,startAge,cycles,hasHour:!!timeStr};
+}
+
+/* ---------- Feng Shui calculation ---------- */
+const rd=n=>{while(n>9) n=[...String(n)].reduce((a,b)=>a+ +b,0);return n;};
+const TRI={1:{d:0,l:'010'},8:{d:1,l:'001'},3:{d:2,l:'100'},4:{d:3,l:'011'},9:{d:4,l:'101'},2:{d:5,l:'000'},7:{d:6,l:'110'},6:{d:7,l:'111'}};
+const RULES=[[2],[0,1],[0,1,2],[],[0],[1,2],[0,2],[1]]; /* Sheng Qi, Tian Yi, Yan Nian, Fu Wei, Huo Hai, Wu Gui, Liu Sha, Jue Ming */
+const TS=[0,1,1,2,3,3,4,5,5,6,7,7];
+const GRID=[3,4,5,2,'c',6,1,0,7], FLY=[7,6,1,4,0,5,2,3];
+function fsCalc(dateStr,gender,cy){
+  const [Y,M,D0]=dateStr.split('-').map(Number);
+  const by=Date.UTC(Y,M-1,D0)>=jieList(Y)[1].t?Y:Y-1;
+  const yy=by>=2000?by-2000:by-1900, s=rd([...String(yy)].reduce((a,b)=>a+ +b,0));
+  let kua=rd(by>=2000?(gender==='male'?9-s:6+s):(gender==='male'?10-s:5+s))||9;
+  if(kua===5) kua=gender==='male'?2:8;
+  const base=TRI[kua].l, rule=Array(8), byRule=Array(8);
+  RULES.forEach((f,i)=>{
+    const l=[...base]; f.forEach(p=>l[p]=l[p]==='1'?'0':'1');
+    const k=+Object.keys(TRI).find(k=>TRI[k].l===l.join('')); rule[TRI[k].d]=i; byRule[i]=TRI[k].d;
+  });
+  let c=11-rd(cy); while(c>9) c-=9;
+  const star=Array(8); FLY.forEach((d,k)=>{star[d]=((c-1+k+1)%9)+1;});
+  const yb=((cy-4)%12+12)%12;
+  return {kua,east:[1,3,4,9].includes(kua),rule,byRule,c,star,cy,ys:((cy-4)%10+10)%10,yb,ts:TS[yb]};
+}
+
+/* ---------- components ---------- */
+const polar=(p,r=80)=>{const a=Math.PI*(1-p/100);return [100+r*Math.cos(a),100-r*Math.sin(a)];};
+const arc=(a,b)=>{const [x1,y1]=polar(a),[x2,y2]=polar(b);return `M${x1} ${y1} A80 80 0 0 1 ${x2} ${y2}`;};
+
+function Gauge({pct,zi}){
+  let from=0; const zones=t('zones');
+  return html`<div class="mx-auto" style=${{maxWidth:'320px'}}>
+    <svg viewBox="0 0 200 120" class="w-full" role="img" aria-label=${pct+'% '+zones[zi]}>
+      ${ZMAX.map((m,i)=>{const s=from;from=Math.min(m,100);return html`<path key=${i} d=${arc(s,from)} fill="none" stroke=${ZCOL[i]} strokeWidth="16" opacity=${i===zi?1:.35} style=${{transition:'opacity .6s'}}/>`;})}
+      <g style=${{transformOrigin:'100px 100px',transform:`rotate(${pct*1.8-90}deg)`,transition:'transform .9s cubic-bezier(.2,.8,.2,1)'}}>
+        <line x1="100" y1="100" x2="100" y2="34" stroke="var(--ink)" strokeWidth="3" strokeLinecap="round"/></g>
+      <circle cx="100" cy="100" r="7" fill="var(--ink)"/>
+    </svg>
+  </div>`;
+}
+
+function Pillar({p,i}){
+  const main=i===2, label=t('pl')[i];
+  if(p.s===null) return html`<div class="soft p-3 text-center flex flex-col items-center justify-center opacity-70">
+    <div class="text-xs muted mb-1">${label}</div><div class="text-sm muted">${t('needTime')}</div></div>`;
+  const en=t('el'), se=Math.floor(p.s/2);
+  return html`<div class="p-3 text-center rounded-2xl" style=${{background:main?'var(--primary)':'var(--soft)',border:'1px solid var(--line)',color:main?'#fff':'var(--ink)'}}>
+    <div class="text-xs mb-2" style=${{opacity:.85}}>${label}${main?' · '+t('dmTag'):''}</div>
+    <div class="cn text-4xl leading-none">${STEMS[p.s]}</div>
+    <div class="text-xs mt-1" style=${{opacity:.85}}>${STEM_PY[p.s]} · ${en[se]}</div>
+    <div class="cn text-4xl leading-none mt-3">${BR[p.b]}</div>
+    <div class="text-xs mt-1" style=${{opacity:.85}}>${BR_PY[p.b]} · ${t('an')[p.b]}</div>
+    <div class="text-xs mt-1" style=${{opacity:.85}}>${en[BR_EL[p.b]]}</div>
+  </div>`;
+}
+
+function Result({r}){
+  const [tab,setTab]=useState(0), max=Math.max(...r.el,1), en=t('el'), zn=t('zones')[r.zi], zc=ZCOL[r.zi];
+  return html`<div class="card p-5 sm:p-6 mt-5 fade">
+    <div class="text-center">
+      <div class="text-sm muted">${t('strength')}</div>
+      <div class="font-bold leading-none my-2" style=${{fontSize:'4.5rem',color:zc,transition:'color .7s'}}>${r.pct}<span class="text-3xl">%</span></div>
+      <div class="font-semibold mb-3" style=${{color:zc,transition:'color .7s'}}>${zn}</div>
+      <${Gauge} pct=${r.pct} zi=${r.zi}/>
+    </div>
+    <${Tabs} labels=${t('tabs')} tab=${tab} setTab=${setTab}/>
+    ${tab===0&&html`<div class="mt-5 fade">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">${[3,2,1,0].map(i=>html`<${Pillar} key=${i} p=${r.pillars[i]} i=${i}/>`)}</div>
+      <p class="text-xs muted mt-3">${t('rl')}</p></div>`}
+    ${tab===1&&html`<div class="mt-5 fade">
+      <p class="text-sm">${t('dmText')(STEMS[r.pillars[2].s],en[r.dm],r.pct,zn)}</p>
+      <h3 class="font-semibold mt-5 mb-2">${t('gods')}</h3>
+      <div class="grid gap-2">${r.gods.map(g=>html`<div key=${g.e} class="soft p-3 flex items-center gap-3">
+        <div class="cn w-11 h-11 rounded-xl grid place-items-center text-2xl text-white shrink-0" style=${{background:ELC[g.e].col}}>${ELC[g.e].c}</div>
+        <div><div class="font-semibold">${en[g.e]}</div><div class="text-sm muted">${t('roles')[g.r]}</div></div></div>`)}</div>
+      <h3 class="font-semibold mt-5 mb-2">${t('five')}</h3>
+      <div class="grid gap-2">${r.el.map((v,i)=>html`<div key=${i} class="flex items-center gap-3 text-sm">
+        <span class="w-16">${en[i]}</span>
+        <div class="flex-1 h-3 rounded-full soft overflow-hidden"><div class="h-full rounded-full" style=${{width:(v/max*100)+'%',background:ELC[i].col,transition:'width .8s'}}></div></div>
+        <span class="w-9 text-right muted">${v.toFixed(1)}</span></div>`)}</div></div>`}
+    ${tab===2&&html`<div class="mt-5 fade">
+      <p class="text-sm">${t('luckText')(r.fwd?t('fwd'):t('bwd'),r.startAge.toFixed(1))}</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">${r.cycles.map((c,i)=>html`<div key=${i} class="soft p-3 text-center">
+        <div class="cn text-3xl leading-none">${STEMS[c.s]}</div><div class="cn text-3xl leading-none mt-1">${BR[c.b]}</div>
+        <div class="text-xs mt-2">${en[Math.floor(c.s/2)]} · ${t('an')[c.b]}</div>
+        <div class="text-xs muted mt-1">${t('age')} ${Math.floor(c.age)}–${Math.floor(c.age)+9}</div>
+        <div class="text-xs muted">${c.year}–${c.year+9}</div></div>`)}</div></div>`}
+    ${!r.hasHour&&html`<p class="text-xs muted mt-5">${t('tip')}</p>`}
+  </div>`;
+}
+
+function Tabs({labels,tab,setTab}){
+  return html`<div class="flex gap-1 p-1 mt-6 soft" role="tablist">${labels.map((l,k)=>html`<button key=${k} role="tab" class="tab" aria-selected=${tab===k} onClick=${()=>setTab(k)}>${l}</button>`)}</div>`;
+}
+
+function Grid({cells}){
+  return html`<div class="grid grid-cols-3 gap-2">${cells.map((c,i)=>html`<div key=${i} class="cell-b" style=${{background:c.bg}}>
+    ${c.dot&&html`<span style=${{position:'absolute',top:6,right:6,width:9,height:9,borderRadius:'50%',background:c.dot}}></span>`}
+    <div class="text-xs muted">${c.top}</div>
+    <div class=${c.big.length>3?'text-sm font-bold':'text-3xl font-bold leading-tight'} style=${{color:c.col}}>${c.big}</div>
+    <div style=${{fontSize:'.68rem',lineHeight:1.3}} class="muted px-1">${c.sub}</div></div>`)}</div>`;
+}
+
+function FsResult({r}){
+  const [tab,setTab]=useState(0), dirs=t('dirs'), dn=t('dn'), stars=t('stars'), en=t('el');
+  const G='#16a34a', R='#e11d48', GOOD=[1,4,6,8,9];
+  const bz=GRID.map(d=>d==='c'?{top:t('kua'),big:String(r.kua),sub:t('grp')[r.east?0:1],bg:'var(--soft)',col:'var(--primary)'}
+    :{top:dirs[d],big:dn[r.rule[d]].n,sub:dn[r.rule[d]].m,bg:r.rule[d]<4?'rgba(22,163,74,.14)':'rgba(225,29,72,.12)',col:r.rule[d]<4?G:R});
+  const an=GRID.map(d=>{const s=d==='c'?r.c:r.star[d], ok=GOOD.includes(s);
+    return {top:d==='c'?t('center'):dirs[d],big:String(s),sub:stars[s-1],bg:ok?'rgba(22,163,74,.10)':'rgba(225,29,72,.10)',col:ok?G:R,
+      dot:d==='c'?null:(r.rule[d]<4?G:R)};});
+  const list=(from,to,col)=>html`<div class="grid gap-2">${r.byRule.slice(from,to).map((d,k)=>html`<div key=${k} class="soft p-3 flex items-center gap-3">
+    <div class="w-2 self-stretch rounded-full" style=${{background:col}}></div>
+    <div><div class="font-semibold">${dirs[d]} · ${dn[from+k].n}</div><div class="text-sm muted">${dn[from+k].m}</div></div></div>`)}</div>`;
+  return html`<div class="card p-5 sm:p-6 mt-5 fade">
+    <div class="text-center">
+      <div class="text-sm muted">${t('kua')}</div>
+      <div class="font-bold leading-none my-2" style=${{fontSize:'5rem',color:r.east?'#16a34a':'var(--primary)',transition:'color .7s'}}>${r.kua}</div>
+      <div class="font-semibold" style=${{color:r.east?'#16a34a':'var(--primary)',transition:'color .7s'}}>${t('grp')[r.east?0:1]}</div>
+    </div>
+    <${Tabs} labels=${t('fsTabs')} tab=${tab} setTab=${setTab}/>
+    ${tab===0&&html`<div class="mt-5 fade">
+      <${Grid} cells=${bz}/><p class="text-xs muted mt-2">${t('southTop')}</p>
+      <h3 class="font-semibold mt-5 mb-2" style=${{color:G}}>${t('good')}</h3>${list(0,4,G)}
+      <h3 class="font-semibold mt-5 mb-2" style=${{color:R}}>${t('bad')}</h3>${list(4,8,R)}</div>`}
+    ${tab===1&&html`<div class="mt-5 fade">
+      <h3 class="font-semibold mb-2">${t('yearInfo')} ${r.cy}</h3>
+      <div class="soft p-3 flex items-center gap-4 mb-4">
+        <div class="cn text-3xl leading-none text-center">${STEMS[r.ys]}<br/>${BR[r.yb]}</div>
+        <div class="text-sm"><div>${STEM_PY[r.ys]} ${BR_PY[r.yb]} · ${en[Math.floor(r.ys/2)]} ${t('an')[r.yb]}</div>
+          <div class="muted">${t('center')}: ${r.c}</div>
+          <div class="muted">${t('taiSui')}: ${dirs[r.ts]} · ${t('suiPo')}: ${dirs[(r.ts+4)%8]}</div></div></div>
+      <h3 class="font-semibold mb-2">${t('annTitle')}</h3>
+      <${Grid} cells=${an}/><p class="text-xs muted mt-2">${t('southTop')} ${t('dots')}</p></div>`}
+    <p class="text-xs muted mt-5">${t('fsDisc')}</p>
+  </div>`;
+}
+
+function App(){
+  const [lang,setLang]=useState('en'), [mode,setMode]=useState(0);
+  const [date,setDate]=useState(''),[time,setTime]=useState(''),[gender,setGender]=useState('');
+  const [cy,setCy]=useState(String(new Date().getFullYear()));
+  const [err,setErr]=useState(''),[res,setRes]=useState(null),[fres,setFres]=useState(null);
+  L=lang;
+  useEffect(()=>{document.documentElement.lang=lang;return ()=>{document.documentElement.lang='en';};},[lang]);
+  const submit=()=>{
+    if(!date) return setErr('eDate');
+    const y=+date.slice(0,4); if(y<1901||y>2100) return setErr('eYear');
+    if(!gender) return setErr('eGender');
+    if(mode===0){ setErr(''); setRes(calc(date,time,gender)); }
+    else { const c=+cy; if(!(c>=1901&&c<=2100)) return setErr('eCy'); setErr(''); setFres(fsCalc(date,gender,c)); }
+  };
+  const reset=()=>{setDate('');setTime('');setGender('');setErr('');setRes(null);setFres(null);setCy(String(new Date().getFullYear()));};
+  const opt=(v,l)=>html`<button type="button" onClick=${()=>setGender(v)} aria-pressed=${gender===v} class="btn flex-1" style=${{border:'1px solid var(--line)',background:gender===v?'var(--primary)':'var(--card)',color:gender===v?'#fff':'var(--ink)'}}>${l}</button>`;
+  const lb=(k,l)=>html`<button onClick=${()=>setLang(k)} aria-pressed=${lang===k} class="px-3 py-1 rounded-full text-sm" style=${{background:lang===k?'var(--primary)':'transparent',color:lang===k?'#fff':'var(--muted)'}}>${l}</button>`;
+  return html`<main class="mx-auto py-4" style=${{maxWidth:'560px'}}>
+    <div class="flex justify-end"><div class="card flex p-1 gap-1" style=${{borderRadius:'999px'}}>${lb('en','EN')}${lb('km','ខ្មែរ')}</div></div>
+    <header class="text-center mb-6 mt-2">
+      <div class="cn text-5xl" style=${{color:'var(--primary)'}}>八字 風水</div>
+      <h2 class="text-lg font-semibold mt-1">${t('title')}</h2>
+      <p class="muted text-sm mt-1">${t('sub')}</p>
+    </header>
+    <section class="card p-5 sm:p-6">
+      <div class="flex gap-1 p-1 soft mb-5" role="tablist">${[t('mBazi'),t('mFs')].map((l,k)=>html`<button key=${k} role="tab" class="tab" style=${{fontSize:'1rem'}} aria-selected=${mode===k} onClick=${()=>{setMode(k);setErr('');}}>${l}</button>`)}</div>
+      <div class="grid gap-4">
+        <label class="grid gap-1 text-sm font-semibold">${t('date')}
+          <input class="field" type="date" min="1901-01-01" max="2100-12-31" value=${date} onInput=${e=>setDate(e.target.value)}/></label>
+        ${mode===0&&html`<label class="grid gap-1 text-sm font-semibold">${t('time')} <span class="muted font-normal">${t('opt')}</span>
+          <input class="field" type="time" value=${time} onInput=${e=>setTime(e.target.value)}/></label>`}
+        ${mode===1&&html`<label class="grid gap-1 text-sm font-semibold">${t('cyear')}
+          <input class="field" type="number" inputmode="numeric" min="1901" max="2100" value=${cy} onInput=${e=>setCy(e.target.value)}/></label>`}
+        <div class="grid gap-1 text-sm font-semibold">${t('gender')}<div class="flex gap-3">${opt('female',t('female'))}${opt('male',t('male'))}</div></div>
+        ${err&&html`<p role="alert" class="text-sm" style=${{color:'var(--primary)'}}>${t(err)}</p>`}
+        <div class="flex gap-3"><button class="btn btn-p flex-1" onClick=${submit}>${t('calc')}</button><button class="btn btn-g" onClick=${reset}>${t('reset')}</button></div>
+      </div>
+    </section>
+    ${mode===0&&res&&html`<${Result} r=${res}/>`}
+    ${mode===1&&fres&&html`<${FsResult} r=${fres}/>`}
+    ${mode===0&&html`<p class="text-xs muted text-center mt-6">${t('disc')}</p>`}
+  </main>`;
+}
+
+return App;
+})();
+const SanYuan=(()=>{
+
+const {useState} = React;
+const html = htm.bind(React.createElement);
+
+/* ---------- data (from the San Yuan Water Method tables in "The Dragons of Water", Master Han) ---------- */
+const DIRS=['North','Northeast','East','Southeast','South','Southwest','West','Northwest'];
+const DS=['N','NE','E','SE','S','SW','W','NW'];
+const TRI=[{c:'坎',p:'Kǎn'},{c:'艮',p:'Gèn'},{c:'震',p:'Zhèn'},{c:'巽',p:'Xùn'},{c:'離',p:'Lí'},{c:'坤',p:'Kūn'},{c:'兌',p:'Duì'},{c:'乾',p:'Qián'}]; /* index = compass direction */
+const TRI_IDX=Object.fromEntries(TRI.map((t,i)=>[t.c,i]));
+const MT=('子 Zǐ N2,癸 Guǐ N3,丑 Chǒu NE1,艮 Gèn NE2,寅 Yín NE3,甲 Jiǎ E1,卯 Mǎo E2,乙 Yǐ E3,辰 Chén SE1,巽 Xùn SE2,巳 Sì SE3,丙 Bǐng S1,午 Wǔ S2,丁 Dīng S3,未 Wèi SW1,坤 Kūn SW2,申 Shēn SW3,庚 Gēng W1,酉 Yǒu W2,辛 Xīn W3,戌 Xū NW1,乾 Qián NW2,亥 Hài NW3,壬 Rén N1')
+  .split(',').map(s=>{const a=s.split(' ');return {c:a[0],p:a[1],l:a[2]};}); /* index*15 = degrees */
+const SIT=['坤','艮','坎','巽','震','離','兌','乾']; /* table columns */
+/* pos/inc/out: 1 auspicious, 0 inauspicious, null not applicable. kind: t trigram, m mountain, x mixed */
+const TYPES=[
+ {n:'Early Heaven',zh:'先天水',k:'t',pos:1,inc:1,out:0,r:'坎乾兌坤艮震巽離',note:'Favors social and professional relations, politics.'},
+ {n:'Later Heaven',zh:'後天水',k:'t',pos:1,inc:1,out:0,r:'巽震坤兌離乾坎艮',note:'Favors wealth and material goods.'},
+ {n:'Heaven Robbery',k:'t',pos:0,inc:0,out:1,r:'震離巽坎乾艮艮震'},
+ {n:'Earth Punishment',k:'t',pos:0,inc:0,out:1,r:'坎兌坤兌坤乾巽離'},
+ {n:'Hall Robbery',k:'t',pos:1,inc:1,out:null,r:'艮坤離乾兌坎震巽'},
+ {n:'VIP',k:'t',pos:1,inc:1,out:null,r:'乾坎震離巽兌艮坤'},
+ {n:'Guest',zh:'客位水',k:'t',pos:1,inc:1,out:null,r:'震巽乾艮坎坤離兌',note:'Supports guests and visitors.'},
+ {n:'Assistant',k:'t',pos:1,inc:1,out:null,r:'兌兌艮震坤巽坤坎'},
+ {n:'Store Pool',k:'x',pos:1,inc:1,out:0,r:'巽乾坤坤壬辛癸艮'},
+ {n:'True Star Killing',k:'m',pos:0,inc:0,out:1,r:'卯寅辰酉申亥巳午'},
+ {n:'Heaven Star Killing',k:'m',pos:0,inc:0,out:0,r:'辰午巳卯寅申酉亥'},
+ {n:'Earth Star Killing',k:'m',pos:0,inc:0,out:0,r:'酉申卯巳亥午辰寅'},
+ {n:'True Exit',k:'m',pos:null,inc:0,out:1,r:'甲坤巽艮乾辛甲巽'}
+];
+
+/* ---------- calculation ---------- */
+const dirOfDeg=d=>Math.floor((((d%360)+360)%360+22.5)%360/45);
+const mtOfDeg=d=>Math.floor((((d%360)+360)%360+7.5)%360/15);
+function resolve(ch,kind){
+  const asTri = kind==='t' || (kind==='x' && TRI_IDX[ch]!==undefined);
+  if(asTri){const d=TRI_IDX[ch];return {ch,py:TRI[d].p,dir:d,sub:DIRS[d]+' · '+(d*45-22.5+360)%360+'°–'+(d*45+22.5)%360+'°'};}
+  const i=MT.findIndex(m=>m.c===ch), deg=i*15;
+  return {ch,py:MT[i].p,dir:dirOfDeg(deg),mt:true,sub:MT[i].l+' · '+deg+'° · '+DIRS[dirOfDeg(deg)]};
+}
+function compute(mode,deg,measures,pick){
+  let sit;
+  if(mode==='pick') sit=pick;
+  else { const d=measures==='facing'?deg+180:deg; sit=dirOfDeg(d); }
+  const col=SIT.indexOf(TRI[sit].c);
+  const rows=TYPES.map(t=>({...t,res:resolve(t.r[col],t.k)}));
+  const sitDeg=mode==='pick'?sit*45:((measures==='facing'?deg+180:deg)%360+360)%360;
+  return {sit,fac:(sit+4)%8,rows,sitDeg,mt:mode==='deg'?MT[mtOfDeg(sitDeg)]:null,fmt:mode==='deg'?MT[mtOfDeg(sitDeg+180)]:null};
+}
+
+/* ---------- components ---------- */
+const q=v=>v===null?{t:'–',c:'var(--muted)'}:v?{t:'Auspicious',c:'var(--good)'}:{t:'Inauspicious',c:'var(--bad)'};
+const dot=v=>v===null?'#9CA3AF':v?'var(--good)':'var(--bad)';
+const GRID=[3,4,5,2,'c',6,1,0,7];
+
+function CompassMap({r}){
+  return html`<div class="grid grid-cols-3 gap-2">${GRID.map(d=>{
+    if(d==='c') return html`<div key="c" class="cell items-center justify-center text-center" style=${{background:'var(--soft)'}}>
+      <div class="text-xs muted">Sitting</div><div class="cn text-3xl leading-none" style=${{color:'var(--primary)'}}>${TRI[r.sit].c}</div>
+      <div class="text-xs">${TRI[r.sit].p}</div></div>`;
+    const here=r.rows.filter(x=>x.res.dir===d);
+    return html`<div key=${d} class="cell" style=${{borderColor:d===r.sit||d===r.fac?'var(--primary)':'var(--line)',borderWidth:d===r.sit||d===r.fac?2:1}}>
+      <div class="flex justify-between text-xs"><b>${DS[d]}</b><span class="cn muted">${TRI[d].c}</span></div>
+      ${d===r.sit&&html`<div class="text-xs" style=${{color:'var(--primary)'}}>House sits here</div>`}
+      ${d===r.fac&&html`<div class="text-xs" style=${{color:'var(--primary)'}}>House faces here</div>`}
+      ${here.map(x=>html`<span key=${x.n} class="chip-sy" style=${{background:dot(x.pos===null?x.inc:x.pos)}}>${x.n}${x.res.mt?' ('+x.res.ch+')':''}</span>`)}
+    </div>`;})}</div>`;
+}
+
+function Result({r}){
+  const [only,setOnly]=useState(false);
+  const rows=only?r.rows.filter(x=>(x.pos===null?x.inc:x.pos)===1):r.rows;
+  return html`<div class="card p-5 sm:p-6 mt-5 fade">
+    <div class="grid grid-cols-2 gap-3 text-center">
+      <div class="soft p-3"><div class="text-xs muted">Sitting</div>
+        <div class="cn text-5xl leading-tight" style=${{color:'var(--primary)'}}>${TRI[r.sit].c}</div>
+        <div class="font-semibold">${TRI[r.sit].p} · ${DIRS[r.sit]}</div>
+        ${r.mt&&html`<div class="text-xs muted">${r.mt.c} ${r.mt.p} (${r.mt.l}) · ${Math.round(r.sitDeg)}°</div>`}</div>
+      <div class="soft p-3"><div class="text-xs muted">Facing</div>
+        <div class="cn text-5xl leading-tight">${TRI[r.fac].c}</div>
+        <div class="font-semibold">${TRI[r.fac].p} · ${DIRS[r.fac]}</div>
+        ${r.fmt&&html`<div class="text-xs muted">${r.fmt.c} ${r.fmt.p} (${r.fmt.l})</div>`}</div>
+    </div>
+
+    <h2 class="font-semibold mt-6 mb-2">Water positions around the house</h2>
+    <${CompassMap} r=${r}/>
+    <p class="text-xs muted mt-2">South is at the top. Green is auspicious, red is inauspicious, gray is not applicable. Directions are measured from the center of the house.</p>
+
+    <div class="flex items-center justify-between mt-6 mb-2 gap-3 flex-wrap">
+      <h2 class="font-semibold">Result table</h2>
+      <label class="text-sm flex items-center gap-2"><input type="checkbox" checked=${only} onChange=${e=>setOnly(e.target.checked)}/> Auspicious only</label>
+    </div>
+    <div class="overflow-x-auto soft" style=${{maxHeight:'28rem'}}>
+      <table class="w-full" style=${{minWidth:'560px',borderCollapse:'separate',borderSpacing:0}}>
+        <thead><tr><th>Type of Qi</th><th>Water position</th><th>Position</th><th>Incoming flow</th><th>Outgoing flow</th></tr></thead>
+        <tbody>${rows.map(x=>html`<tr key=${x.n}>
+          <td><b>${x.n}</b>${x.zh&&html` <span class="cn muted">${x.zh}</span>`}${x.note&&html`<div class="text-xs muted">${x.note}</div>`}</td>
+          <td><span class="cn text-xl">${x.res.ch}</span> ${x.res.py}<div class="text-xs muted">${x.res.sub}</div></td>
+          ${[x.pos,x.inc,x.out].map((v,i)=>html`<td key=${i} style=${{color:q(v).c,fontWeight:600}}>${q(v).t}</td>`)}
+        </tr>`)}</tbody>
+      </table>
+    </div>
+    <p class="text-xs muted mt-3">Position is where the water sits. Incoming flow is water entering the property from that place. Outgoing flow is water leaving through it. Early Heaven, Later Heaven, Hall Robbery, VIP, Guest, and Assistant use the 8 directions. Store Pool, the Star Killings, and True Exit use the 24 Mountains ring of the Luó Pán.</p>
+  </div>`;
+}
+
+function App(){
+  const [mode,setMode]=useState('deg'),[deg,setDeg]=useState(''),[measures,setMeasures]=useState('facing'),[pick,setPick]=useState(0);
+  const [err,setErr]=useState(''),[res,setRes]=useState(null);
+  const submit=()=>{
+    if(mode==='deg'){
+      const d=parseFloat(deg);
+      if(isNaN(d)||d<0||d>=360) return setErr('Enter a compass bearing from 0 to 359.9 degrees.');
+      setErr(''); setRes(compute('deg',d,measures,0));
+    } else { setErr(''); setRes(compute('pick',0,measures,pick)); }
+  };
+  const reset=()=>{setDeg('');setErr('');setRes(null);setPick(0);setMeasures('facing');};
+  const seg=(v,l,cur,set)=>html`<button type="button" class="seg" aria-pressed=${cur===v} onClick=${()=>set(v)}>${l}</button>`;
+  return html`<main class="mx-auto py-4" style=${{maxWidth:'600px'}}>
+    <header class="text-center mb-6">
+      <div class="cn text-5xl" style=${{color:'var(--primary)'}}>三元水法</div>
+      <h2 class="text-lg font-semibold mt-1">San Yuan Water Method Calculator</h2>
+      <p class="muted text-sm mt-1">Find the beneficial and harmful water positions and flows from the sitting of your house.</p>
+    </header>
+    <section class="card p-5 sm:p-6">
+      <div class="grid gap-4">
+        <div class="flex gap-1 p-1 soft">${seg('deg','Compass degrees',mode,setMode)}${seg('pick','Pick a direction',mode,setMode)}</div>
+        ${mode==='deg'?html`
+          <div class="flex gap-1 p-1 soft">${seg('facing','I measured the Facing',measures,setMeasures)}${seg('sitting','I measured the Sitting',measures,setMeasures)}</div>
+          <label class="grid gap-1 text-sm font-semibold">Compass bearing (degrees)
+            <input class="field" type="number" inputmode="decimal" min="0" max="359.9" step="0.1" placeholder="e.g. 180" value=${deg} onInput=${e=>setDeg(e.target.value)}/></label>`
+        :html`<label class="grid gap-1 text-sm font-semibold">Sitting of the house
+            <select class="field" value=${pick} onChange=${e=>setPick(+e.target.value)}>${TRI.map((t,i)=>html`<option key=${i} value=${i}>${t.c} ${t.p} – ${DIRS[i]}</option>`)}</select></label>`}
+        ${err&&html`<p role="alert" class="text-sm" style=${{color:'var(--primary)'}}>${err}</p>`}
+        <div class="flex gap-3"><button class="btn btn-p flex-1" onClick=${submit}>Calculate</button><button class="btn btn-g" onClick=${reset}>Reset</button></div>
+        <p class="text-xs muted">Use the direction of the facing wall (the wall with the main door). If the door and that wall fall in different trigrams, the facing wall decides the Facing. The Sitting is the opposite side. Measure from the center of the house.</p>
+      </div>
+    </section>
+    ${res&&html`<${Result} r=${res}/>`}
+    <p class="text-xs muted text-center mt-6">For learning and entertainment. Based on the San Yuan Water Method tables in “The Dragons of Water” by Master Han. The method applies to the external environment, such as lakes, ponds, pools, and rivers. For a real property, consult a qualified Feng Shui master.</p>
+  </main>`;
+}
+
+return App;
+})();
+const FiveGhosts=(()=>{
+
+const {useState} = React;
+const html = htm.bind(React.createElement);
+
+/* ---------- data (Five Ghosts Carry Treasure, "The Dragons of Water" by Master Han) ---------- */
+const DIRS=['North','Northeast','East','Southeast','South','Southwest','West','Northwest'];
+const TRI={坎:['Kǎn','North'],艮:['Gèn','Northeast'],震:['Zhèn','East'],巽:['Xùn','Southeast'],離:['Lí','South'],坤:['Kūn','Southwest'],兌:['Duì','West'],乾:['Qián','Northwest']};
+const LINES={坎:'010',艮:'001',震:'100',巽:'011',離:'101',坤:'000',兌:'110',乾:'111'}; /* bottom, middle, top */
+const ORDER=['坎','艮','震','巽','離','坤','兌','乾'];
+/* Earth Plate: 24 Mountains grouped by trigram. Book shows 乾甲, 巽辛, 亥卯未庚; the others follow the standard grouping. */
+const GROUP={乾:'乾甲',坤:'坤乙',艮:'艮丙',巽:'巽辛',坎:'癸申子辰',離:'壬寅午戌',震:'庚亥卯未',兌:'丁巳酉丑'};
+const MT=('子 Zǐ N2,癸 Guǐ N3,丑 Chǒu NE1,艮 Gèn NE2,寅 Yín NE3,甲 Jiǎ E1,卯 Mǎo E2,乙 Yǐ E3,辰 Chén SE1,巽 Xùn SE2,巳 Sì SE3,丙 Bǐng S1,午 Wǔ S2,丁 Dīng S3,未 Wèi SW1,坤 Kūn SW2,申 Shēn SW3,庚 Gēng W1,酉 Yǒu W2,辛 Xīn W3,戌 Xū NW1,乾 Qián NW2,亥 Hài NW3,壬 Rén N1')
+  .split(',').map((s,i)=>{const a=s.split(' ');return {c:a[0],p:a[1],l:a[2],deg:i*15};});
+const MT_TRI={}; ORDER.forEach(t=>[...GROUP[t]].forEach(m=>MT_TRI[m]=t));
+/* Door trigram -> [Mountain trigram, Water trigram] (theory table, page 130) */
+const RULE={巽:['乾','震'],坎:['兌','離'],艮:['離','兌'],坤:['震','乾'],乾:['巽','坤'],兌:['坎','艮'],離:['艮','坎'],震:['坤','巽']};
+const mtOfDeg=d=>Math.floor((((d%360)+360)%360+7.5)%360/15);
+const info=ch=>MT.find(m=>m.c===ch);
+
+/* ---------- calculation ---------- */
+function check(deg,tri){
+  if(deg===null) return null;
+  const m=MT[mtOfDeg(deg)];
+  return {m,deg,ok:GROUP[tri].includes(m.c)};
+}
+function compute(doorCh,mDeg,wDeg){
+  const door=info(doorCh), dt=MT_TRI[doorCh], [mt,wt]=RULE[dt];
+  return {door,dt,mt,wt,mAllowed:[...GROUP[mt]].map(info),wAllowed:[...GROUP[wt]].map(info),dAllowed:[...GROUP[dt]].map(info),
+    cm:check(mDeg,mt),cw:check(wDeg,wt)};
+}
+
+/* ---------- components ---------- */
+function Lines({t,hl=[],color}){
+  const b=LINES[t];
+  return html`<svg viewBox="0 0 40 36" width="44" height="40" aria-hidden="true">
+    ${[2,1,0].map((k,row)=>{const y=4+row*12, c=hl.includes(k)?color:'#64748B';
+      return b[k]==='1'?html`<rect key=${k} x="3" y=${y} width="34" height="6" rx="1.5" fill=${c}/>`
+        :html`<g key=${k}><rect x="3" y=${y} width="14" height="6" rx="1.5" fill=${c}/><rect x="23" y=${y} width="14" height="6" rx="1.5" fill=${c}/></g>`;})}
+  </svg>`;
+}
+
+function Ring({r}){
+  const P=(rad,a)=>[100+rad*Math.sin(a*Math.PI/180),100-rad*Math.cos(a*Math.PI/180)];
+  const role=ch=>MT_TRI[ch]===r.dt?'d':MT_TRI[ch]===r.mt?'m':MT_TRI[ch]===r.wt?'w':null;
+  const col={d:'var(--door)',m:'var(--mtn)',w:'var(--water)'};
+  return html`<svg viewBox="0 0 200 200" class="w-full mx-auto" style=${{maxWidth:'340px'}} role="img" aria-label="24 Mountains ring with door, mountain and water positions">
+    ${MT.map((m,i)=>{
+      const a0=i*15-7.5+180,a1=a0+15,[x1,y1]=P(96,a0),[x2,y2]=P(96,a1),[x3,y3]=P(62,a1),[x4,y4]=P(62,a0),[tx,ty]=P(79,i*15+180), ro=role(m.c);
+      return html`<g key=${m.c}><path d=${`M${x1} ${y1} A96 96 0 0 1 ${x2} ${y2} L${x3} ${y3} A62 62 0 0 0 ${x4} ${y4} Z`}
+        fill=${ro?col[ro]:'var(--soft)'} stroke="var(--line)" strokeWidth=".8" style=${{transition:'fill .5s'}}/>
+        <text x=${tx} y=${ty} textAnchor="middle" dominantBaseline="central" fontSize="10" class="cn" fill=${ro?'#fff':'var(--muted)'}>${m.c}</text></g>`;})}
+    <text x="100" y="94" textAnchor="middle" fontSize="9" fill="var(--muted)">Door</text>
+    <text x="100" y="110" textAnchor="middle" fontSize="20" class="cn" fill="var(--door)">${r.dt}</text>
+  </svg>`;
+}
+
+const Chips=({list,bg})=>list.map(m=>html`<span key=${m.c} class="chip" style=${{background:bg}}><span class="cn">${m.c}</span> ${m.p} · ${m.l} · ${m.deg}°</span>`);
+
+function Result({r}){
+  const cards=[['Door',r.dt,[],'var(--door)','The trigram of your door direction'],['Mountain',r.mt,[0],'var(--mtn)','Change the bottom line of the Door'],['Water',r.wt,[0,1,2],'var(--water)','Change all three lines of the Door']];
+  const rows=[['Door',r.dt,r.dAllowed,'var(--door)'],['Mountain',r.mt,r.mAllowed,'var(--mtn)'],['Water',r.wt,r.wAllowed,'var(--water)']];
+  const chk=[['Mountain',r.cm,r.mt],['Water',r.cw,r.wt]].filter(x=>x[1]);
+  return html`<div class="card p-5 sm:p-6 mt-5 fade">
+    <div class="grid grid-cols-3 gap-2 text-center">${cards.map(([n,t,hl,c,sub])=>html`<div key=${n} class="soft p-3">
+      <div class="text-xs muted">${n}</div><div class="flex justify-center my-1"><${Lines} t=${t} hl=${hl} color=${c}/></div>
+      <div class="cn text-3xl leading-none" style=${{color:c}}>${t}</div><div class="text-xs mt-1">${TRI[t][0]} · ${TRI[t][1]}</div>
+      <div class="muted mt-1" style=${{fontSize:'.68rem',lineHeight:1.3}}>${sub}</div></div>`)}</div>
+
+    <h2 class="font-semibold mt-6 mb-2">24 Mountains ring</h2>
+    <${Ring} r=${r}/>
+    <div class="flex justify-center gap-4 text-xs mt-2 flex-wrap">
+      <span><b style=${{color:'var(--door)'}}>■</b> Door</span><span><b style=${{color:'var(--mtn)'}}>■</b> Mountain</span><span><b style=${{color:'var(--water)'}}>■</b> Water</span></div>
+    <p class="text-xs muted text-center mt-1">South is at the top. Bearings are in degrees from North.</p>
+
+    <h2 class="font-semibold mt-6 mb-2">Result table</h2>
+    <div class="overflow-x-auto soft"><table style=${{minWidth:'520px'}}>
+      <thead><tr><th>Role</th><th>Trigram</th><th>Allowed directions (24 Mountains)</th></tr></thead>
+      <tbody>${rows.map(([n,t,l,c])=>html`<tr key=${n}><td><b style=${{color:c}}>${n}</b></td>
+        <td><span class="cn text-xl">${t}</span> ${TRI[t][0]}</td><td><${Chips} list=${l} bg=${c}/></td></tr>`)}</tbody></table></div>
+    <p class="text-xs muted mt-2">Your Door is ${r.door.c} ${r.door.p} (${r.door.l}, ${r.door.deg}°), which belongs to Trigram ${r.dt} ${TRI[r.dt][0]}. Only one Mountain and one Water from the lists above are needed.</p>
+
+    ${chk.length>0&&html`<h2 class="font-semibold mt-6 mb-2">Check your site</h2>
+    <div class="overflow-x-auto soft"><table style=${{minWidth:'480px'}}>
+      <thead><tr><th>Form</th><th>Your bearing</th><th>Needed</th><th>Result</th></tr></thead>
+      <tbody>${chk.map(([n,c,t])=>html`<tr key=${n}><td><b>${n}</b></td>
+        <td>${c.deg}° = <span class="cn">${c.m.c}</span> ${c.m.p} (${c.m.l})</td>
+        <td><span class="cn">${GROUP[t].split('').join(' ')}</span></td>
+        <td style=${{color:c.ok?'var(--good)':'var(--bad)',fontWeight:600}}>${c.ok?'Matches':'Does not match'}</td></tr>`)}</tbody></table></div>
+    <p class="text-xs muted mt-2">${r.cm&&r.cw?(r.cm.ok&&r.cw.ok?'Door, Mountain, and Water are combined correctly.':'The three factors are not all combined, so the formula does not work yet.'):'Enter both a Mountain and a Water bearing to check the full combination.'}</p>`}
+
+    <h2 class="font-semibold mt-6 mb-2">Reference table: all doors</h2>
+    <div class="overflow-x-auto soft"><table style=${{minWidth:'520px'}}>
+      <thead><tr><th>Door</th><th>Mountain (Dragon)</th><th>Water</th></tr></thead>
+      <tbody>${ORDER.map(t=>html`<tr key=${t} class=${t===r.dt?'hl':''}>
+        <td><span class="cn text-lg">${t}</span> ${TRI[t][0]}<div class="cn text-xs muted">${GROUP[t]}</div></td>
+        <td><span class="cn text-lg">${RULE[t][0]}</span> ${TRI[RULE[t][0]][0]}<div class="cn text-xs muted">${GROUP[RULE[t][0]]}</div></td>
+        <td><span class="cn text-lg">${RULE[t][1]}</span> ${TRI[RULE[t][1]][0]}<div class="cn text-xs muted">${GROUP[RULE[t][1]]}</div></td></tr>`)}</tbody></table></div>
+
+    <h2 class="font-semibold mt-6 mb-2">Implementation rules</h2>
+    <ul class="text-sm grid gap-2 list-disc pl-5">
+      <li>Door, Water, and Mountain must all be combined. If one is missing, the formula does not work.</li>
+      <li>Use the same reference point for Water and Mountain: the door if both are visible from it, otherwise the center of the house for both.</li>
+      <li>The Water must “contain” the Mountain: its volume and nearness should be equal to or larger than the Mountain.</li>
+      <li>The water level must be below the doorstep, especially for an artificial flow.</li>
+      <li>Place the Water before the Mountain.</li>
+      <li>Water and Mountain should also activate good Flying Stars.</li>
+    </ul>
+  </div>`;
+}
+
+function App(){
+  const [mode,setMode]=useState('deg'),[deg,setDeg]=useState(''),[pick,setPick]=useState('巽'),[md,setMd]=useState(''),[wd,setWd]=useState('');
+  const [err,setErr]=useState(''),[res,setRes]=useState(null);
+  const num=v=>{if(v.trim()==='') return null;const n=parseFloat(v);return isNaN(n)||n<0||n>=360?NaN:n;};
+  const submit=()=>{
+    let door;
+    if(mode==='deg'){const d=num(deg); if(d===null||isNaN(d)) return setErr('Enter the door bearing from 0 to 359.9 degrees.'); door=MT[mtOfDeg(d)].c;}
+    else door=pick;
+    const m=num(md), w=num(wd);
+    if(Number.isNaN(m)||Number.isNaN(w)) return setErr('Mountain and Water bearings must be from 0 to 359.9 degrees, or left empty.');
+    setErr(''); setRes(compute(door,m,w));
+  };
+  const reset=()=>{setDeg('');setMd('');setWd('');setPick('巽');setErr('');setRes(null);};
+  const seg=(v,l)=>html`<button type="button" class="seg" aria-pressed=${mode===v} onClick=${()=>setMode(v)}>${l}</button>`;
+  const inp=(label,val,set,ph)=>html`<label class="grid gap-1 text-sm font-semibold">${label}
+    <input class="field" type="number" inputmode="decimal" min="0" max="359.9" step="0.1" placeholder=${ph} value=${val} onInput=${e=>set(e.target.value)}/></label>`;
+  return html`<main class="mx-auto py-4" style=${{maxWidth:'600px'}}>
+    <header class="text-center mb-6">
+      <div class="cn text-5xl" style=${{color:'var(--primary)'}}>五鬼運財</div>
+      <h2 class="text-lg font-semibold mt-1">Five Ghosts Carry Treasure Calculator</h2>
+      <p class="muted text-sm mt-1">Find the Mountain and Water directions that match your Door.</p>
+    </header>
+    <section class="card p-5 sm:p-6"><div class="grid gap-4">
+      <div class="flex gap-1 p-1 soft">${seg('deg','Door bearing')}${seg('pick','Pick door mountain')}</div>
+      ${mode==='deg'?inp('Door direction (degrees)',deg,setDeg,'e.g. 135')
+        :html`<label class="grid gap-1 text-sm font-semibold">Door direction (24 Mountains)
+          <select class="field" value=${pick} onChange=${e=>setPick(e.target.value)}>${MT.map(m=>html`<option key=${m.c} value=${m.c}>${m.c} ${m.p} (${m.l}) · ${m.deg}°</option>`)}</select></label>`}
+      <div class="soft p-3 grid gap-3"><div class="text-sm font-semibold">Check your site <span class="muted font-normal">(optional)</span></div>
+        <div class="grid grid-cols-2 gap-3">${inp('Mountain bearing',md,setMd,'degrees')}${inp('Water bearing',wd,setWd,'degrees')}</div>
+        <p class="text-xs muted">Measure both from the same reference point: the door if both are visible from it, otherwise the center of the house.</p></div>
+      ${err&&html`<p role="alert" class="text-sm" style=${{color:'var(--primary)'}}>${err}</p>`}
+      <div class="flex gap-3"><button class="btn btn-p flex-1" onClick=${submit}>Calculate</button><button class="btn btn-g" onClick=${reset}>Reset</button></div>
+    </div></section>
+    ${res&&html`<${Result} r=${res}/>`}
+    <p class="text-xs muted text-center mt-6">For learning and entertainment. Based on the Five Ghosts Carry Treasure formula in “The Dragons of Water” by Master Han. Only the Qián, Xùn, and Zhèn groupings of the 24 Mountains appear in the book’s example; the other trigram groupings follow the standard Earth Plate arrangement. For a real property, consult a qualified Feng Shui master.</p>
+  </main>`;
+}
+
+return App;
+})();
+const TanLang=(()=>{
+
+const {useState} = React;
+const html = htm.bind(React.createElement);
+
+/* ---------- data (Tān Láng Nine Stars of Water, "The Dragons of Water" by Master Han) ---------- */
+const TRI={坎:['Kǎn','North'],艮:['Gèn','Northeast'],震:['Zhèn','East'],巽:['Xùn','Southeast'],離:['Lí','South'],坤:['Kūn','Southwest'],兌:['Duì','West'],乾:['Qián','Northwest']};
+const GROUP={乾:'乾甲',坤:'坤乙',艮:'艮丙',巽:'巽辛',坎:'癸申子辰',離:'壬寅午戌',震:'庚亥卯未',兌:'丁巳酉丑'};
+const MT=('子 Zǐ N2,癸 Guǐ N3,丑 Chǒu NE1,艮 Gèn NE2,寅 Yín NE3,甲 Jiǎ E1,卯 Mǎo E2,乙 Yǐ E3,辰 Chén SE1,巽 Xùn SE2,巳 Sì SE3,丙 Bǐng S1,午 Wǔ S2,丁 Dīng S3,未 Wèi SW1,坤 Kūn SW2,申 Shēn SW3,庚 Gēng W1,酉 Yǒu W2,辛 Xīn W3,戌 Xū NW1,乾 Qián NW2,亥 Hài NW3,壬 Rén N1')
+  .split(',').map((s,i)=>{const a=s.split(' ');return {c:a[0],p:a[1],l:a[2],deg:i*15};});
+const MT_TRI={}; Object.keys(GROUP).forEach(t=>[...GROUP[t]].forEach(m=>MT_TRI[m]=t));
+const STARS=[
+ {n:1,c:'貪狼',p:'Tān Láng',en:'Greedy Wolf',s:90},{n:2,c:'巨門',p:'Jù Mén',en:'Huge Door',s:80},
+ {n:3,c:'祿存',p:'Lù Cún',en:'Rewards',s:-60},{n:4,c:'文曲',p:'Wén Qǔ',en:'Literary Arts',s:-80},
+ {n:5,c:'廉貞',p:'Lián Zhēn',en:'Chastity',s:-70},{n:6,c:'武曲',p:'Wǔ Qǔ',en:'Military Arts',s:70},
+ {n:7,c:'破軍',p:'Pò Jūn',en:'Broken Soldier',s:-90},{n:8,c:'輔弼',p:'Fǔ Bì',en:'Assistants',s:60}];
+const SIT=['坤','艮','坎','巽','震','離','兌','乾']; /* Facing trigram = table column */
+const ROWS=['離震乾兌艮坤巽坎','乾兌離震巽坎艮坤','巽坎艮坤乾兌離震','艮坤巽坎離震乾兌','震離兌乾坤艮坎巽','坎巽坤艮兌乾震離','兌乾震離坎巽坤艮','坤艮坎巽震離兌乾'];
+const mtOfDeg=d=>Math.floor((((d%360)+360)%360+7.5)%360/15);
+const info=ch=>MT.find(m=>m.c===ch);
+const sg=n=>(n>0?'+':'')+n;
+
+/* ---------- calculation ---------- */
+function compute(doorCh,waters){
+  const ft=MT_TRI[doorCh], col=SIT.indexOf(ft);
+  const stars=STARS.map((s,i)=>{const t=ROWS[i][col];return {...s,t,list:[...GROUP[t]].map(info)};});
+  const byMt={}; stars.forEach(s=>s.list.forEach(m=>{byMt[m.c]=s;}));
+  const checks=waters.map(w=>{const m=MT[mtOfDeg(w.deg)];return {...w,m,star:byMt[m.c]};});
+  return {door:info(doorCh),ft,stars,byMt,checks};
+}
+
+/* ---------- components ---------- */
+const CX=110;
+const pt=(r,a)=>[CX+r*Math.sin(a*Math.PI/180),CX-r*Math.cos(a*Math.PI/180)];
+const sector=(i,ra,rb)=>{const a0=i*15-7.5+180,a1=a0+15,[x1,y1]=pt(ra,a0),[x2,y2]=pt(ra,a1),[x3,y3]=pt(rb,a1),[x4,y4]=pt(rb,a0);
+  return `M${x1} ${y1} A${ra} ${ra} 0 0 1 ${x2} ${y2} L${x3} ${y3} A${rb} ${rb} 0 0 0 ${x4} ${y4} Z`;};
+
+function Compass({r}){
+  const doorI=MT.findIndex(m=>m.c===r.door.c);
+  return html`<svg viewBox="0 0 220 220" class="w-full mx-auto" style=${{maxWidth:'380px'}} role="img" aria-label="Compass chart of the Tan Lang Nine Stars scores around the 24 Mountains">
+    ${MT.map((m,i)=>{
+      const s=r.byMt[m.c], good=s.s>0, op=.18+Math.abs(s.s)/130, col=good?'var(--good)':'var(--bad)';
+      const [cx,cy]=pt(82,i*15+180), [sx,sy]=pt(56,i*15+180);
+      return html`<g key=${m.c}>
+        <path d=${sector(i,96,68)} fill=${col} fillOpacity=${op} stroke="var(--card)" strokeWidth="1"/>
+        <path d=${sector(i,68,44)} fill=${col} fillOpacity=${Math.min(1,op+.3)} stroke="var(--card)" strokeWidth="1"/>
+        <text x=${cx} y=${cy} textAnchor="middle" dominantBaseline="central" fontSize="11" class="cn" fill="var(--ink)">${m.c}</text>
+        <text x=${sx} y=${sy} textAnchor="middle" dominantBaseline="central" fontSize="7.5" fontWeight="700" fill=${good?'#FFFFFF':'#000000'}>${sg(s.s)}</text></g>`;})}
+    <circle cx=${CX} cy=${CX} r="42" fill="var(--soft)" stroke="var(--line)"/>
+    <text x=${CX} y="100" textAnchor="middle" fontSize="8" fill="var(--muted)">Facing</text>
+    <text x=${CX} y="120" textAnchor="middle" fontSize="22" class="cn" fill="var(--primary)">${r.ft}</text>
+    <g transform=${`rotate(${doorI*15+180} ${CX} ${CX})`}><path d="M110 2 L104 13 L116 13 Z" fill="var(--primary)"/></g>
+    ${r.checks.map((w,k)=>{const [x,y]=pt(103,w.deg+180);return html`<g key=${k}><circle cx=${x} cy=${y} r="7" fill="var(--water)" stroke="#fff" strokeWidth="1.5"/>
+      <text x=${x} y=${y} textAnchor="middle" dominantBaseline="central" fontSize="7" fontWeight="700" fill="#fff">W${k+1}</text></g>`;})}
+  </svg>`;
+}
+
+function Result({r}){
+  const [only,setOnly]=useState(false);
+  const rows=only?r.stars.filter(s=>s.s>0):r.stars;
+  return html`<div class="card p-5 sm:p-6 mt-5 fade">
+    <div class="soft p-4 text-center">
+      <div class="text-xs muted">Facing (door direction)</div>
+      <div class="cn text-5xl leading-tight" style=${{color:'var(--primary)'}}>${r.door.c}</div>
+      <div class="font-semibold">${r.door.p} · ${r.door.l} · ${r.door.deg}°</div>
+      <div class="text-sm muted">Trigram <span class="cn">${r.ft}</span> ${TRI[r.ft][0]} · ${GROUP[r.ft].split('').join(' ')}</div>
+    </div>
+
+    <h2 class="font-semibold mt-6 mb-2">Compass chart</h2>
+    <${Compass} r=${r}/>
+    <div class="flex justify-center gap-4 text-xs mt-2 flex-wrap">
+      <span><b style=${{color:'var(--good)'}}>■</b> Auspicious</span><span><b style=${{color:'var(--bad)'}}>■</b> Inauspicious</span>
+      <span><b style=${{color:'var(--primary)'}}>▲</b> Door</span>${r.checks.length>0&&html`<span><b style=${{color:'var(--water)'}}>●</b> Your water</span>`}</div>
+    <p class="text-xs muted text-center mt-1">South is at the top. Outer ring: the 24 Mountains. Inner ring: the score of each direction.</p>
+
+    <div class="flex items-center justify-between mt-6 mb-2 gap-3 flex-wrap">
+      <h2 class="font-semibold">Result table</h2>
+      <label class="text-sm flex items-center gap-2"><input type="checkbox" checked=${only} onChange=${e=>setOnly(e.target.checked)}/> Auspicious only</label>
+    </div>
+    <div class="overflow-x-auto soft"><table style=${{minWidth:'560px'}}>
+      <thead><tr><th>#</th><th>Star</th><th>Nature</th><th>Score</th><th>Trigram</th><th>Directions (24 Mountains)</th></tr></thead>
+      <tbody>${rows.map(s=>{const c=s.s>0?'var(--good)':'var(--bad)';return html`<tr key=${s.n}>
+        <td>${s.n}</td>
+        <td><span class="cn text-lg">${s.c}</span><div class="text-xs muted">${s.p} (${s.en})</div></td>
+        <td style=${{color:c,fontWeight:600}}>${s.s>0?'Auspicious':'Inauspicious'}</td>
+        <td style=${{color:c,fontWeight:700}}>${sg(s.s)}</td>
+        <td><span class="cn text-lg">${s.t}</span> ${TRI[s.t][0]}</td>
+        <td>${s.list.map(m=>html`<span key=${m.c} class="chip-tl" style=${{background:c}}><span class="cn">${m.c}</span> ${m.l} · ${m.deg}°</span>`)}</td></tr>`;})}</tbody></table></div>
+
+    ${r.checks.length>0&&html`<h2 class="font-semibold mt-6 mb-2">Your water positions</h2>
+    <div class="overflow-x-auto soft"><table style=${{minWidth:'480px'}}>
+      <thead><tr><th>Water</th><th>Bearing</th><th>Mountain</th><th>Star</th><th>Result</th></tr></thead>
+      <tbody>${r.checks.map((w,k)=>{const c=w.star.s>0?'var(--good)':'var(--bad)';return html`<tr key=${k}>
+        <td><b>W${k+1}</b></td><td>${w.deg}°</td><td><span class="cn">${w.m.c}</span> ${w.m.p} (${w.m.l})</td>
+        <td><span class="cn">${w.star.c}</span> ${w.star.p}</td>
+        <td style=${{color:c,fontWeight:700}}>${sg(w.star.s)} ${w.star.s>0?'Auspicious':'Inauspicious'}</td></tr>`;})}</tbody></table></div>`}
+
+    <h2 class="font-semibold mt-6 mb-2">Application notes</h2>
+    <ul class="text-sm grid gap-2 list-disc pl-5">
+      <li>Facing means the direction of the door. Each trigram stands for 2 or 4 directions of the 24 Mountains (Earth Plate).</li>
+      <li>The method suits static water such as a pool, fish pond, or fountain, and also water flows.</li>
+      <li>Measure a water position from the door if it is visible from the door, otherwise from the center of the house.</li>
+      <li>Size matters. The larger the surface and the volume, the stronger the effect.</li>
+      <li>Also check the other methods, such as Flying Stars and the Sān Yuán Water Method, so that all of them agree.</li>
+    </ul>
+  </div>`;
+}
+
+function App(){
+  const [mode,setMode]=useState('deg'),[deg,setDeg]=useState(''),[pick,setPick]=useState('坤'),[ws,setWs]=useState(['']);
+  const [err,setErr]=useState(''),[res,setRes]=useState(null);
+  const num=v=>{if(v.trim()==='') return null;const n=parseFloat(v);return isNaN(n)||n<0||n>=360?NaN:n;};
+  const submit=()=>{
+    let door;
+    if(mode==='deg'){const d=num(deg); if(d===null||isNaN(d)) return setErr('Enter the door bearing from 0 to 359.9 degrees.'); door=MT[mtOfDeg(d)].c;} else door=pick;
+    const waters=[];
+    for(const v of ws){const n=num(v); if(Number.isNaN(n)) return setErr('Water bearings must be from 0 to 359.9 degrees, or left empty.'); if(n!==null) waters.push({deg:n});}
+    setErr(''); setRes(compute(door,waters));
+  };
+  const reset=()=>{setDeg('');setPick('坤');setWs(['']);setErr('');setRes(null);};
+  const seg=(v,l)=>html`<button type="button" class="seg" aria-pressed=${mode===v} onClick=${()=>setMode(v)}>${l}</button>`;
+  const numField=(label,val,set,ph)=>html`<label class="grid gap-1 text-sm font-semibold">${label}
+    <input class="field" type="number" inputmode="decimal" min="0" max="359.9" step="0.1" placeholder=${ph} value=${val} onInput=${e=>set(e.target.value)}/></label>`;
+  return html`<main class="mx-auto py-4" style=${{maxWidth:'600px'}}>
+    <header class="text-center mb-6">
+      <div class="cn text-5xl" style=${{color:'var(--primary)'}}>貪狼九星</div>
+      <h2 class="text-lg font-semibold mt-1">Tān Láng Nine Stars of Water Calculator</h2>
+      <p class="muted text-sm mt-1">Find the best and worst water positions from the facing of your house.</p>
+    </header>
+    <section class="card p-5 sm:p-6"><div class="grid gap-4">
+      <div class="flex gap-1 p-1 soft">${seg('deg','Facing bearing')}${seg('pick','Pick facing mountain')}</div>
+      ${mode==='deg'?numField('Facing direction (degrees)',deg,setDeg,'e.g. 225')
+        :html`<label class="grid gap-1 text-sm font-semibold">Facing direction (24 Mountains)
+          <select class="field" value=${pick} onChange=${e=>setPick(e.target.value)}>${MT.map(m=>html`<option key=${m.c} value=${m.c}>${m.c} ${m.p} (${m.l}) · ${m.deg}°</option>`)}</select></label>`}
+      <div class="soft p-3 grid gap-3">
+        <div class="text-sm font-semibold">Check your water <span class="muted font-normal">(optional)</span></div>
+        ${ws.map((v,i)=>html`<div key=${i} class="flex gap-2 items-end"><div class="flex-1">${numField('Water '+(i+1)+' bearing',v,x=>setWs(ws.map((o,k)=>k===i?x:o)),'degrees')}</div>
+          ${ws.length>1&&html`<button class="btn btn-g" aria-label=${'Remove water '+(i+1)} onClick=${()=>setWs(ws.filter((_,k)=>k!==i))}>×</button>`}</div>`)}
+        ${ws.length<4&&html`<button class="btn btn-g text-sm" onClick=${()=>setWs([...ws,''])}>+ Add another water</button>`}
+        <p class="text-xs muted">Measure from the door if the water is visible from it, otherwise from the center of the house.</p>
+      </div>
+      ${err&&html`<p role="alert" class="text-sm" style=${{color:'var(--primary)'}}>${err}</p>`}
+      <div class="flex gap-3"><button class="btn btn-p flex-1" onClick=${submit}>Calculate</button><button class="btn btn-g" onClick=${reset}>Reset</button></div>
+    </div></section>
+    ${res&&html`<${Result} r=${res}/>`}
+    <p class="text-xs muted text-center mt-6">For learning and entertainment. Based on the Tān Láng Nine Stars of Water method in “The Dragons of Water” by Master Han. For a real property, consult a qualified Feng Shui master.</p>
+  </main>`;
+}
+
+return App;
+})();
+
+const {useState,useEffect,useRef}=React;
+const html=htm.bind(React.createElement);
+const TABS=[['bazi','八字 風水','BaZi and Kua'],['water','三元水法','San Yuan'],['ghosts','五鬼運財','Five Ghosts'],['tanlang','貪狼九星','Tān Láng']];
+const TOOLS={bazi:BaziKua,water:SanYuan,ghosts:FiveGhosts,tanlang:TanLang};
+
+/* ---------- sign up / log in (frontend only; data is kept in this browser) ---------- */
+const mem={};
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);if(v!==null)return JSON.parse(v);}catch(e){} return mem[k]!==undefined?mem[k]:d;},
+  set(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+};
+const normPhone=p=>{let d=String(p).replace(/\D/g,'');if(d.startsWith('855')&&d.length>=11)d='0'+d.slice(3);return d;};
+function authenticate(mode,name,phone){
+  const n=String(name).trim().replace(/\s+/g,' '), p=normPhone(phone);
+  if(n.length<2) return {err:'Please enter your name.'};
+  if(p.length<8||p.length>15) return {err:'Please enter a valid phone number, for example 096 241 9898.'};
+  const users=store.get('kft_users',{}), u=users[p];
+  if(mode==='signup'){
+    if(u) return {err:'This phone number is already registered. Please log in.'};
+    users[p]={name:n,created:Date.now()}; store.set('kft_users',users);
+  } else {
+    if(!u) return {err:'No account found for this number. Please sign up first.'};
+    if(u.name.toLowerCase()!==n.toLowerCase()) return {err:'The name does not match this phone number.'};
+  }
+  const session={name:u?u.name:n,phone:p}; store.set('kft_session',session);
+  return {session};
+}
+
+function AuthModal({start,onClose,onAuth}){
+  const [mode,setMode]=useState(start),[name,setName]=useState(''),[phone,setPhone]=useState(''),[err,setErr]=useState('');
+  const ref=useRef(null);
+  useEffect(()=>{
+    if(ref.current) ref.current.focus();
+    const k=e=>{if(e.key==='Escape')onClose();};
+    document.addEventListener('keydown',k);return()=>document.removeEventListener('keydown',k);
+  },[]);
+  const submit=()=>{const r=authenticate(mode,name,phone); if(r.err) return setErr(r.err); onAuth(r.session);};
+  const enter=e=>{if(e.key==='Enter')submit();};
+  const seg=(v,l)=>html`<button type="button" class="seg" aria-pressed=${mode===v} onClick=${()=>{setMode(v);setErr('');}}>${l}</button>`;
+  return html`<div class="fixed inset-0 z-50 flex items-center justify-center p-4" style=${{background:'rgba(59,18,32,.5)'}} onClick=${onClose}>
+    <div class="card p-5 sm:p-6 w-full fade" style=${{maxWidth:'420px'}} role="dialog" aria-modal="true" aria-labelledby="authTitle" onClick=${e=>e.stopPropagation()}>
+      <div class="flex justify-between items-center mb-4">
+        <h2 id="authTitle" class="text-xl font-bold">${mode==='login'?'Log in':'Sign up'}</h2>
+        <button class="btn btn-g" style=${{height:'2.25rem',padding:'0 .8rem'}} aria-label="Close" onClick=${onClose}>×</button>
+      </div>
+      <div class="grid gap-4">
+        <div class="flex gap-1 p-1 soft">${seg('login','Log in')}${seg('signup','Sign up')}</div>
+        <label class="grid gap-1 text-sm font-semibold">Name
+          <input ref=${ref} class="field" type="text" autoComplete="name" value=${name} onInput=${e=>setName(e.target.value)} onKeyDown=${enter}/></label>
+        <label class="grid gap-1 text-sm font-semibold">Phone number
+          <input class="field" type="tel" inputMode="tel" autoComplete="tel" placeholder="096 241 9898" value=${phone} onInput=${e=>setPhone(e.target.value)} onKeyDown=${enter}/></label>
+        ${err&&html`<p role="alert" class="text-sm" style=${{color:'var(--primary)'}}>${err}</p>`}
+        <button class="btn btn-p" onClick=${submit}>${mode==='login'?'Log in':'Create account'}</button>
+        <p class="text-xs muted">Your name and phone number are saved on this device only. There is no code verification.</p>
+      </div>
+    </div></div>`;
+}
+
+function Shell(){
+  const [tab,setTab]=useState(()=>{const h=location.hash.slice(1);return TOOLS[h]?h:'bazi';});
+  const [user,setUser]=useState(()=>store.get('kft_session',null));
+  const [auth,setAuth]=useState(null);
+  useEffect(()=>{try{history.replaceState(null,'','#'+tab);}catch(e){}},[tab]);
+  const Tool=TOOLS[tab];
+  const logout=()=>{store.set('kft_session',null);setUser(null);};
+  const small={height:'2.25rem',padding:'0 .9rem',fontSize:'.85rem'};
+  return html`<div class="mx-auto px-4 pt-4 sm:pt-8" style=${{maxWidth:'600px'}}>
+    <div class="flex justify-end items-center gap-2 mb-3" style=${{minHeight:'2.25rem'}}>
+      ${user?html`<span class="text-sm muted" style=${{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>Hello, <b style=${{color:'var(--ink)'}}>${user.name}</b></span>
+          <button class="btn btn-g" style=${small} onClick=${logout}>Log out</button>`
+        :html`<button class="btn btn-g" style=${small} onClick=${()=>setAuth('signup')}>Sign up</button>
+          <button class="btn btn-p" style=${small} onClick=${()=>setAuth('login')}>Log in</button>`}
+    </div>
+    <header class="text-center mb-5">
+      <h1 class="text-3xl font-bold" style=${{color:'var(--primary)'}}>Khmer Fortune Teller</h1>
+      <p class="muted text-sm mt-1">BaZi and Feng Shui calculators</p>
+    </header>
+    <nav class="card p-1 flex gap-1" role="tablist" aria-label="Calculators">
+      ${TABS.map(([k,z,l])=>html`<button key=${k} role="tab" class="seg" aria-selected=${tab===k} aria-pressed=${tab===k}
+        style=${{padding:'.5rem .1rem',lineHeight:1.25}} onClick=${()=>{setTab(k);window.scrollTo({top:0,behavior:'smooth'});}}>
+        <span class="cn block" style=${{fontSize:'.95rem'}}>${z}</span><span class="block" style=${{fontSize:'.68rem'}}>${!user&&'🔒 '}${l}</span></button>`)}
+    </nav>
+    ${user?html`<div class="fade" key=${tab} style=${{paddingTop:'1rem'}}><${Tool}/></div>`
+      :html`<div class="card p-6 mt-4 text-center fade">
+        <div style=${{fontSize:'2.5rem',lineHeight:1}} aria-hidden="true">🔒</div>
+        <h2 class="text-xl font-bold mt-3">Log in to use the calculators</h2>
+        <p class="muted text-sm mt-2">Sign up with your name and phone number to open the BaZi and Kua, San Yuan Water, Five Ghosts, and Tān Láng calculators.</p>
+        <div class="flex gap-3 justify-center mt-5">
+          <button class="btn btn-p" onClick=${()=>setAuth('login')}>Log in</button>
+          <button class="btn btn-g" onClick=${()=>setAuth('signup')}>Sign up</button>
+        </div></div>`}
+    <footer class="text-center text-sm muted mt-6 pt-4 pb-8" style=${{borderTop:'1px solid var(--line)'}}>By Kang Puthearoath</footer>
+    ${auth&&html`<${AuthModal} start=${auth} onClose=${()=>setAuth(null)} onAuth=${u=>{setUser(u);setAuth(null);}}/>`}
+  </div>`;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(html`<${Shell}/>`);
+
+</script>
+</body>
+</html>

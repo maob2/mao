@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>He-Luo Date Selector</title>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbe9dd;--card:rgba(255,249,244,.9);--ink:#3d2029;--mute:#7a5560;--line:#e2bfb4;--good:#17725a;--bad:#a93428;--mid:#9a6b12;--acc:#8a3550;--page:linear-gradient(160deg,#f9dcc8 0%,#f6c6d3 48%,#f0d38f 100%);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#3a2a2e;--card:rgba(58,36,42,.92);--ink:#fbe9dd;--mute:#d8b5b9;--line:#6b4a52;--good:#6fdcb6;--bad:#ff9a8a;--mid:#f0c35c;--acc:#f3b6c6;--page:linear-gradient(160deg,#4a2f33 0%,#4d2e3d 48%,#5a4a24 100%)}}
+:root[data-theme="dark"]{--bg:#3a2a2e;--card:rgba(58,36,42,.92);--ink:#fbe9dd;--mute:#d8b5b9;--line:#6b4a52;--good:#6fdcb6;--bad:#ff9a8a;--mid:#f0c35c;--acc:#f3b6c6;--page:linear-gradient(160deg,#4a2f33 0%,#4d2e3d 48%,#5a4a24 100%)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html{background:#f6c6d3}body{margin:0;min-height:100vh;background:var(--page) fixed;color:var(--ink);font:16px/1.5 "Work Sans",system-ui,sans-serif}
+#root{max-width:560px;margin:0 auto;padding:18px 16px 40px}
+h1{font:700 26px/1.15 Spectral,Georgia,serif;margin:4px 0 4px}h2{font:700 18px Spectral,Georgia,serif;margin:0 0 10px}
+.sub{color:var(--mute);font-size:14px;margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cell{border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:8px 4px;text-align:center;font:inherit;cursor:pointer;min-height:64px}
+.cell b{display:block;font-size:15px}.cell small{color:var(--mute);font-size:12px}
+.cell.on{background:var(--acc);color:#fff;border-color:var(--acc)}.cell.on small{color:#fff;opacity:.8}
+.cell.mid{border-style:dashed;cursor:default;display:flex;align-items:center;justify-content:center;color:var(--mute)}
+.chips{display:flex;gap:6px;margin-top:10px}.chip{flex:1;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:8px;font:inherit;cursor:pointer}
+.chip.on{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc);font-weight:600}
+.verdict{border-radius:14px;padding:18px 16px;margin-bottom:12px;border:2px solid var(--c);background:var(--card)}
+.verdict .big{font:700 44px/1 Spectral,Georgia,serif;color:var(--c);margin:0}
+.verdict .grade{font-weight:600;margin:6px 0 8px;color:var(--c)}
+.pill{display:inline-block;border-radius:999px;border:1px solid var(--line);padding:2px 10px;font-size:13px;margin:2px 4px 2px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:7px 4px;border-bottom:1px solid var(--line)}th{color:var(--mute);font-weight:500}
+.scroll{overflow-x:auto}
+.slot{display:flex;align-items:center;gap:10px;width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 10px;margin-bottom:6px;font:inherit;text-align:left;cursor:pointer}
+.slot.on{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}
+.note{color:var(--mute);font-size:13px}
+.warn{color:var(--bad);font-weight:600}
+.go{width:100%;border:0;border-radius:12px;padding:14px;font:600 17px "Work Sans",sans-serif;color:#fff;background:linear-gradient(90deg,#b8456b,#c9962e);cursor:pointer;margin-bottom:12px}
+.seg{display:flex;gap:6px;margin-bottom:12px}.seg button{flex:1;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:9px;font:inherit;cursor:pointer}.seg button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.row{display:flex;gap:8px}.row>*{flex:1}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--mid);outline-offset:2px}
+</style></head><body><div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script>
+const h=React.createElement,{useState,useMemo}=React;
+/* ---------- He-Luo core (verified against the book's printed tables) ---------- */
+const SEQ=["Xun","Zhong","Qian","Dui","Gen","Li","Kan","Kun","Zhen"];
+const NUM={Kan:1,Kun:2,Zhen:3,Xun:4,Zhong:5,Qian:6,Dui:7,Gen:8,Li:9};
+const BPAL=["Kan","Gen","Gen","Zhen","Xun","Xun","Li","Kun","Kun","Dui","Qian","Qian"];
+const ELN=["","Water","Fire","Wood","Metal","Earth","Water","Fire","Wood","Metal"];
+const idx=p=>SEQ.indexOf(p);
+const valAt=(f,t)=>((6+((idx(t)-idx(f)+9)%9))%9)+1;
+const palAt=(f,n)=>SEQ[(idx(f)+((n-7+9)%9))%9];
+const posPal=(r,t)=>BPAL[(r+t+2)%12];
+const shen=(r,t,m)=>valAt(posPal(r,t),m);
+const GEN={Water:"Wood",Wood:"Fire",Fire:"Earth",Earth:"Metal",Metal:"Water"},CTL={Water:"Fire",Fire:"Metal",Metal:"Wood",Wood:"Earth",Earth:"Water"};
+const rel=(m,e)=>GEN[e]===m?"R":e===m?"P":CTL[m]===e?"W":CTL[e]===m?"A":"D";
+const RN={R:"Resource",P:"Peer",W:"Wealth",A:"Attack",D:"Drain"};
+const yearSan=y=>({5:3,9:3,1:3,8:9,0:9,4:9,11:7,3:7,7:7,2:1,6:1,10:1})[y];
+const suiPo=y=>NUM[BPAL[(y+6)%12]];
+const yr5=Y=>{const c=((11-(Y%9))%9)||9,k=((5-c)%9+9)%9;return((5+k-1)%9)+1};
+const mSan=(y,m,n)=>NUM[palAt(posPal(y,(m+2)%12),n)];
+const startP=y=>[0,3,6,9].includes(y)?"Gen":[2,5,8,11].includes(y)?"Kun":"Zhong";
+const m5=(y,m)=>NUM[SEQ[(idx(startP(y))+m)%9]];
+const mBig=(y,m)=>NUM[SEQ[((idx(startP(y))-m)%9+9)%9]];
+const mSmall=(y,m)=>NUM[SEQ[(idx(y%2===0?"Zhong":"Li")+m)%9]];
+/* ---------- Calendar (Four Pillars) ---------- */
+const STEM=["Jia","Yi","Bing","Ding","Wu","Ji","Geng","Xin","Ren","Gui"],BR=["Zi","Chou","Yin","Mao","Chen","Si","Wu","Wei","Shen","You","Xu","Hai"];
+const sunLon=jd=>{const T=(jd-2451545)/36525,r=Math.PI/180,L0=280.46646+36000.76983*T,M=(357.52911+35999.05029*T)*r,
+C=(1.914602-.004817*T)*Math.sin(M)+.019993*Math.sin(2*M)+.000289*Math.sin(3*M),o=(125.04-1934.136*T)*r;
+return(((L0+C-.00569-.00478*Math.sin(o))%360)+360)%360};
+let _f=null;
+function lunarOf(Y,M,D){try{_f=_f||new Intl.DateTimeFormat("en-u-ca-chinese",{year:"numeric",month:"numeric",day:"numeric"});
+ const o={};_f.formatToParts(new Date(Y,M-1,D,12)).forEach(x=>o[x.type]=x.value);
+ const m=String(o.month);return{y:+o.relatedYear,m:parseInt(m,10),leap:/bis|leap/i.test(m),d:+o.day}}catch(e){return null}}
+function lunarToGreg(ly,lm,leap,ld){const s=new Date(ly,0,10);for(let i=0;i<420;i++){const t=new Date(s.getTime()+i*864e5),L=lunarOf(t.getFullYear(),t.getMonth()+1,t.getDate());
+ if(L&&L.y===ly&&L.m===lm&&L.leap===leap&&L.d===ld)return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0")}return null}
+function pillars(ds,slot,o){
+ const [Y,Mo,D]=ds.split("-").map(Number),dt=new Date(Y,Mo-1,D,slot*2,30);
+ const L=sunLon(dt.getTime()/864e5+2440587.5),LU=lunarOf(Y,Mo,D);
+ let yr=(Mo<=2&&L>=270&&L<315)?Y-1:Y,mi=Math.floor((((L-315)%360+360)%360)/30);
+ if(o.yearBasis==="lunar"&&LU)yr=LU.y;
+ if(o.monthBasis==="lunar"&&LU)mi=LU.m-1;
+ const ys=((yr-4)%10+10)%10,yb=((yr-4)%12+12)%12,mb=(mi+2)%12,ms=(((ys%5)*2+2+mi)%10);
+ const di=(Math.round((Date.UTC(Y,Mo-1,D)-Date.UTC(2000,0,1))/864e5)+54)%60,dI=(di+60)%60,ds_=dI%10,db=dI%12;
+ const hs=((ds_%5)*2+slot)%10;
+ return{yr,mi,ys,yb,mb,ms,ds:ds_,db,hs,hb:slot,LU};
+}
+/* ---------- 36 verdicts (key = sorted relations) ---------- */
+// [score, text, exempt-from-killing]  score: 3 excellent,2 good,1 fair-good,0 mixed,-1 bad,-2 very bad
+const V={
+RRR:[3,"Three Resources: very auspicious. Wealth, status and long life; blessings last.",0],
+PPP:[3,"Three Peers: very auspicious. Fortune and rank grow together.",0],
+WWW:[3,"Three Wealth: auspicious and ignores killing numbers. Money comes within 100 days.",1],
+GRD:[3,"Three Greedy Wolves (1-1-1): supreme grade, ignores killing numbers. Fastest route to wealth.",1],
+DDD:[-1,"Three Drains: unfavorable. Official trouble and lost wealth.",0],
+AAA:[-2,"Three Attacks: very unfavorable. Losses and wasted wealth within 100 days.",0],
+PRR:[3,"Two Resources + one Peer: very auspicious. Lasting wealth and status; people and money both rise.",0],
+RRW:[2,"Two Resources + one Wealth: auspicious. Small gains in wealth.",0],
+ARR:[3,"Two Resources + one Attack: very auspicious only if the Attack sits on the hour.",0,"hourA"],
+DRR:[2,"Two Resources + one Drain: auspicious and peaceful, only if the Drain sits on the hour.",0,"hourD"],
+PPR:[2,"Two Peers + one Resource: auspicious. People and wealth both advance.",0],
+PPW:[2,"Two Peers + one Wealth: auspicious. Wealth comes in.",0],
+APP:[0,"Two Peers + one Attack: mixed. Disputes and lawsuits; half good, half bad.",0],
+DPP:[0,"Two Peers + one Drain: calm, but bad if killing numbers are present.",0],
+RWW:[3,"Two Wealth + one Resource: very auspicious. People, wealth and standing (small wealth).",0],
+PWW:[2,"Two Wealth + one Peer: auspicious. Small wealth within 100 days and a growing household.",0],
+AWW:[-2,"Two Wealth + one Attack: very unfavorable. Small gain first, then disputes and big losses.",0],
+DWW:[-1,"Two Wealth + one Drain: unfavorable. Losses within 100 days.",0],
+AAR:[-1,"Two Attacks + one Resource: unfavorable. Quarrels, illness and losses.",0],
+AAP:[-1,"Two Attacks + one Peer: unfavorable. Illness, disputes and losses.",0],
+AAD:[-2,"Two Attacks + one Drain: very unfavorable. Disputes and lingering illness.",0],
+AAW:[-2,"Two Attacks + one Wealth: very unfavorable. Heavy losses and legal trouble.",0],
+DDR:[1,"Two Drains + one Resource: fair. Peaceful.",0],
+DDW:[-1,"Two Drains + one Wealth: unfavorable. Trouble and lost wealth.",0],
+DDP:[-1,"Two Drains + one Peer: unfavorable. Good at first, bad later.",0],
+ADD:[-1,"Two Drains + one Attack: unfavorable. Losses and legal trouble.",0],
+DPR:[2,"Resource + Peer + Drain: auspicious. Peaceful, with small gains.",0],
+PRW:[3,"Resource + Peer + Wealth: very auspicious. Wealth, status and a thriving household.",0],
+APR:[0,"Resource + Peer + Attack: neutral. Peaceful.",0],
+DRW:[1,"Resource + Wealth + Drain: fair. Some small wealth.",0],
+ARW:[-1,"Resource + Wealth + Attack: unfavorable. Disputes and lost wealth.",0],
+ADR:[-1,"Resource + Drain + Attack: slightly unfavorable. Illness and lost wealth.",0],
+APW:[-1,"Peer + Wealth + Attack: unfavorable. Legal trouble and lost wealth.",0],
+DPW:[1,"Peer + Wealth + Drain: fair. Small wealth, but only if the layout is right.",0],
+ADW:[-1,"Wealth + Attack + Drain: unfavorable. Lost wealth and illness.",0],
+ADP:[-1,"Peer + Attack + Drain: unfavorable. Disputes and verbal trouble.",0]};
+const GRADE={3:"Excellent",2:"Good",1:"Fairly good",0:"Mixed",[-1]:"Poor",[-2]:"Very poor"};
+const MTNS={Kan:[["Ren","壬"],["Zi","子"],["Gui","癸"]],Gen:[["Chou","丑"],["Gen","艮"],["Yin","寅"]],Zhen:[["Jia","甲"],["Mao","卯"],["Yi","乙"]],Xun:[["Chen","辰"],["Xun","巽"],["Si","巳"]],Li:[["Bing","丙"],["Wu","午"],["Ding","丁"]],Kun:[["Wei","未"],["Kun","坤"],["Shen","申"]],Dui:[["Geng","庚"],["You","酉"],["Xin","辛"]],Qian:[["Xu","戌"],["Qian","乾"],["Hai","亥"]]};
+const DIR={Kan:"N",Gen:"NE",Zhen:"E",Xun:"SE",Li:"S",Kun:"SW",Dui:"W",Qian:"NW"};
+const LAYOUT=["Xun","Li","Kun","Zhen",null,"Dui","Gen","Kan","Qian"];
+function judge(ds,slot,pal,o){
+ const p=pillars(ds,slot,o),mt=NUM[pal],me=ELN[mt];
+ const nums=[shen(p.yb,p.mb,pal),shen(p.yb,p.db,pal),shen(p.mb,p.hb,pal)];
+ const rels=nums.map(n=>rel(me,ELN[n]));
+ const Y3=yearSan(p.yb),CL=suiPo(p.yb);
+ const kills=[["Year Three-Killings",Y3],["Year Clash",CL],["Year Five-Yellow",yr5(p.yr)],["Month Three-Killings",mSan(p.yb,p.mi,Y3)],["Month Clash",mSan(p.yb,p.mi,CL)],["Month Five-Yellow",m5(p.yb,p.mi)],["Great Month Establishment",mBig(p.yb,p.mi)],["Small Month Establishment",mSmall(p.yb,p.mi)]];
+ const hits=[];nums.forEach((n,i)=>kills.forEach(([k,v])=>{if(v===n)hits.push([["Month","Day","Hour"][i],n,k])}));
+ const key=[...rels].sort().join(""),ent=nums.every(n=>n===1)?V.GRD:V[key];
+ let s=ent[0],note="";
+ if(ent[3]==="hourA"&&rels[2]!=="A"){s=0;note="The Attack is not on the hour pillar, so the grade drops to mixed."}
+ if(ent[3]==="hourD"&&rels[2]!=="D"){s=0;note="The Drain is not on the hour pillar, so the grade drops to mixed."}
+ let spoiled=false;if(hits.length&&!ent[2]&&s>=0){s=-1;spoiled=true}
+ return{p,me,mt,nums,rels,kills,hits,s,text:ent[1],note,spoiled,exempt:!!ent[2]};
+}
+const vcol=s=>s>=1?"var(--good)":s===0?"var(--mid)":"var(--bad)";
+const vword=s=>s>=1?"Good":s===0?"Neutral":"Bad";
+const pn=(s,b)=>s[0]+s.slice(1).toLowerCase()+" "+BR[b]; 
+function App(){
+ const t=new Date(),pad=n=>String(n).padStart(2,"0"),iso=t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate());
+ const L0=lunarOf(t.getFullYear(),t.getMonth()+1,t.getDate())||{y:t.getFullYear(),m:1,leap:false,d:1};
+ const [mode,setMode]=useState("g"),[date,setDate]=useState(iso),[ly,setLy]=useState(L0.y),[lm,setLm]=useState(L0.m),[ld,setLd]=useState(L0.d),[leap,setLeap]=useState(L0.leap);
+ const [slot,setSlot]=useState(Math.floor(((t.getHours()+1)%24)/2)),[pal,setPal]=useState("Kan"),[mi,setMi]=useState(1);
+ const [mb,setMb]=useState("solar"),[yb,setYb]=useState("solar"),[res,setRes]=useState(null),[err,setErr]=useState("");
+ const calc=()=>{let d=date;setErr("");
+  if(mode==="l"){d=lunarToGreg(+ly,+lm,leap,+ld);if(!d){setErr("That lunar date does not exist. Check the month, leap setting and day.");setRes(null);return}}
+  if(!d){setErr("Choose a date.");return}
+  setRes({d,slot,pal,mi,o:{monthBasis:mb,yearBasis:yb}})};
+ const R=useMemo(()=>res&&judge(res.d,res.slot,res.pal,res.o),[res]);
+ const all=useMemo(()=>res&&[...Array(12).keys()].map(i=>judge(res.d,i,res.pal,res.o)),[res]);
+ const stem=(a,b)=>STEM[a]+" "+BR[b];
+ const seg=(v,set,opts)=>h("div",{className:"seg"},opts.map(([k,n])=>h("button",{key:k,className:v===k?"on":"",onClick:()=>set(k)},n)));
+ let out=null;
+ if(R){const p=R.p,r=R,mtn=MTNS[res.pal][res.mi],LU=p.LU,[gy,gm,gd]=res.d.split("-");
+  out=h("div",null,
+  h("div",{className:"verdict",style:{"--c":vcol(r.s)}},
+   h("p",{className:"big"},vword(r.s)),
+   h("p",{className:"grade"},GRADE[r.s]+(r.spoiled?" (spoiled by killing numbers)":"")),
+   h("p",{style:{margin:"0 0 6px"}},r.text),
+   r.note&&h("p",{className:"note",style:{margin:"0 0 6px"}},r.note),
+   r.hits.length>0&&h("p",{className:"warn",style:{margin:"6px 0 0"}},"Killing numbers hit: "+r.hits.map(x=>x[0]+" "+x[1]+" ("+x[2]+")").join("; ")),
+   r.hits.length>0&&r.exempt&&h("p",{className:"note",style:{margin:"4px 0 0"}},"This pattern ignores killing numbers, so the date still stands."),
+   h("p",{className:"note",style:{margin:"8px 0 0"}},"For "+mtn[0]+" mountain ("+res.pal+", "+r.me+" "+r.mt+")")),
+  h("div",{className:"card"},h("h2",null,"Calendar check"),
+   h("p",{style:{margin:"0 0 4px"}},"Gregorian: "+gd+"/"+gm+"/"+gy+", "+BR[res.slot]+" hour"),
+   h("p",{style:{margin:"0 0 4px"}},LU?"Lunar: year "+LU.y+", "+(LU.leap?"leap ":"")+"month "+LU.m+", day "+LU.d:"Lunar date is not supported by this browser."),
+   h("p",{style:{margin:0}},"Pillars: Year "+stem(p.ys,p.yb)+", Month "+stem(p.ms,p.mb)+", Day "+stem(p.ds,p.db)+", Hour "+stem(p.hs,p.hb)),
+   h("p",{className:"note",style:{margin:"6px 0 0"}},"Year by "+(res.o.yearBasis==="lunar"?"Lunar New Year":"Start of Spring")+"; month by "+(res.o.monthBasis==="lunar"?"lunar month":"solar terms")+".")),
+  h("div",{className:"card"},h("h2",null,"How it was worked out"),
+   h("div",{className:"scroll"},h("table",null,h("thead",null,h("tr",null,["Pillar","Branch","Number","Element","Relation"].map(x=>h("th",{key:x},x)))),
+    h("tbody",null,["Month","Day","Hour"].map((n,i)=>h("tr",{key:n},h("td",null,n),h("td",null,BR[[p.mb,p.db,p.hb][i]]),h("td",null,r.nums[i]),h("td",null,ELN[r.nums[i]]),h("td",null,RN[r.rels[i]]))))))),
+  h("div",{className:"card"},h("h2",null,"Killing numbers to avoid"),
+   h("div",null,r.kills.map(([k,v])=>h("span",{key:k,className:"pill"},k+": "+v)))),
+  h("div",{className:"card"},h("h2",null,"All time slots on this date"),
+   all.map((x,i)=>h("div",{key:i,className:"slot"+(i===res.slot?" on":"")},
+    h("span",{className:"dot",style:{background:vcol(x.s)}}),
+    h("span",{style:{flex:1}},BR[i]+" hour "+((i*2+23)%24)+":00 to "+((i*2+1)%24)+":00"),
+    h("b",{style:{color:vcol(x.s)}},vword(x.s))))))}
+ return h("div",null,
+  h("h1",null,"He-Luo Date Selector"),
+  h("p",{className:"sub"},"Choose a Gregorian or lunar date, a time and the sitting direction, then press Calculate."),
+  h("div",{className:"card"},
+   h("label",null,"Date type"),seg(mode,setMode,[["g","Gregorian date"],["l","Lunar date"]]),
+   mode==="g"?h("div",null,h("label",{htmlFor:"d"},"Date"),h("input",{id:"d",type:"date",value:date,onChange:e=>setDate(e.target.value)})):
+   h("div",null,h("div",{className:"row"},
+     h("div",null,h("label",{htmlFor:"ly"},"Lunar year"),h("input",{id:"ly",type:"number",min:1901,max:2099,value:ly,onChange:e=>setLy(e.target.value)})),
+     h("div",null,h("label",{htmlFor:"lm"},"Month"),h("select",{id:"lm",value:lm,onChange:e=>setLm(+e.target.value)},[...Array(12).keys()].map(i=>h("option",{key:i,value:i+1},i+1)))),
+     h("div",null,h("label",{htmlFor:"ld"},"Day"),h("select",{id:"ld",value:ld,onChange:e=>setLd(+e.target.value)},[...Array(30).keys()].map(i=>h("option",{key:i,value:i+1},i+1))))),
+    h("label",{style:{marginTop:8,fontWeight:500}},h("input",{type:"checkbox",checked:leap,onChange:e=>setLeap(e.target.checked),style:{width:"auto",marginRight:8}}),"Leap month")),
+   h("div",{style:{height:12}}),
+   h("label",{htmlFor:"s"},"Time of day"),
+   h("select",{id:"s",value:slot,onChange:e=>setSlot(+e.target.value)},BR.map((b,i)=>h("option",{key:i,value:i},b+" hour, "+((i*2+23)%24)+":00 to "+((i*2+1)%24)+":00")))),
+  h("div",{className:"card"},
+   h("label",null,"Sitting direction (the back of the house)"),
+   h("div",{className:"grid"},LAYOUT.map((k,i)=>k?h("button",{key:i,className:"cell"+(k===pal?" on":""),onClick:()=>{setPal(k);setMi(1)},"aria-pressed":k===pal},h("b",null,k),h("small",null,DIR[k]+" · "+ELN[NUM[k]])):h("div",{key:i,className:"cell mid"},"Center"))),
+   h("div",{className:"chips"},MTNS[pal].map((m,i)=>h("button",{key:i,className:"chip"+(i===mi?" on":""),onClick:()=>setMi(i)},m[0]+" "+m[1])))),
+  h("div",{className:"card"},
+   h("label",null,"Month is taken from"),seg(mb,setMb,[["solar","Solar terms"],["lunar","Lunar month"]]),
+   h("label",null,"Year changes at"),seg(yb,setYb,[["solar","Start of Spring"],["lunar","Lunar New Year"]]),
+   h("p",{className:"note",style:{margin:0}},"Solar terms and Start of Spring are the standard Four Pillars rules. Switch to lunar if your almanac counts by lunar months.")),
+  h("button",{className:"go",onClick:calc},"Calculate"),
+  err&&h("p",{className:"warn"},err),
+  out,
+  h("p",{className:"note"},"Relations are measured from the mountain’s own element: Resource generates it, Peer matches it, Wealth is controlled by it, Attack controls it, Drain is generated by it. Early and late Zi hours are not split. Yin-fu and San-sha remedies from the book are not included. For study and entertainment, not a guarantee of outcomes."));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+</script></body></html>
